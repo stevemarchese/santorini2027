@@ -82,6 +82,24 @@ describe('toggleWindow', () => {
     const second = toggleWindow(first, 'window_3');
     expect(second.windowPriority).toBe('window_1');
   });
+
+  it('reassigns priority to the remaining window when the priority window is deselected and one window remains', () => {
+    const twoSelected = toggleWindow(toggleWindow(EMPTY_DRAFT, 'window_1'), 'window_2');
+    expect(twoSelected.windowPriority).toBe('window_1');
+    const deselectedPriority = toggleWindow(twoSelected, 'window_1');
+    expect(deselectedPriority.window1Selected).toBe(false);
+    expect(deselectedPriority.window2Selected).toBe(true);
+    expect(deselectedPriority.windowPriority).toBe('window_2');
+  });
+
+  it('clears priority to null when the priority window is deselected and two windows remain', () => {
+    const allThree = toggleWindow(toggleWindow(toggleWindow(EMPTY_DRAFT, 'window_1'), 'window_2'), 'window_3');
+    expect(allThree.windowPriority).toBe('window_1');
+    const deselectedPriority = toggleWindow(allThree, 'window_1');
+    expect(deselectedPriority.window2Selected).toBe(true);
+    expect(deselectedPriority.window3Selected).toBe(true);
+    expect(deselectedPriority.windowPriority).toBeNull();
+  });
 });
 
 describe('setWindowPriority', () => {
