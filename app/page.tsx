@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Hero from '@/components/Hero';
 import OpeningModule from '@/components/modules/OpeningModule';
+import HotelModule from '@/components/modules/HotelModule';
 import { getNextModule } from '@/lib/flow';
 import { EMPTY_DRAFT } from '@/lib/types';
 import type { DraftResponse, ModuleId } from '@/lib/types';
@@ -19,6 +20,7 @@ export default function Home() {
     <main>
       <Hero />
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
+      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
     </main>
   );
 }
