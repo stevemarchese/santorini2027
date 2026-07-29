@@ -25,4 +25,14 @@ describe('POST /api/admin/login', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('set-cookie')).toContain('admin_session=');
   });
+
+  it('returns 400 for a request body that is not valid JSON', async () => {
+    const { POST } = await import('./route');
+    const request = new Request('http://localhost/api/admin/login', {
+      method: 'POST',
+      body: 'not json',
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
 });

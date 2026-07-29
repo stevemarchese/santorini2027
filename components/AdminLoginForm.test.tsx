@@ -15,4 +15,15 @@ describe('AdminLoginForm', () => {
     await user.click(screen.getByRole('button', { name: /enter/i }));
     expect(await screen.findByText(/incorrect password/i)).toBeInTheDocument();
   });
+
+  it('shows a network-error message and stays usable when fetch rejects', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
+    const user = userEvent.setup();
+    render(<AdminLoginForm />);
+    await user.type(screen.getByLabelText(/admin password/i), 'wrong');
+    await user.click(screen.getByRole('button', { name: /enter/i }));
+
+    expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /enter/i })).not.toBeDisabled();
+  });
 });

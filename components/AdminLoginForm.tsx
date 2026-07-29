@@ -7,15 +7,19 @@ export default function AdminLoginForm() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const response = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    if (response.ok) {
-      window.location.reload();
-    } else {
-      setError('Incorrect password');
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        setError('Incorrect password');
+      }
+    } catch {
+      setError('Something went wrong — please try again');
     }
   }
 

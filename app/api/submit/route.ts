@@ -6,7 +6,13 @@ import { getResendClient } from '@/lib/resend-client';
 import type { DraftResponse } from '@/lib/types';
 
 export async function POST(request: Request) {
-  const draft = (await request.json()) as DraftResponse;
+  let draft: DraftResponse;
+  try {
+    draft = (await request.json()) as DraftResponse;
+  } catch {
+    return NextResponse.json({ errors: ['Invalid request body'] }, { status: 400 });
+  }
+
   const errors = validateDraftForSubmit(draft);
   if (errors.length > 0) {
     return NextResponse.json({ errors }, { status: 400 });
@@ -19,7 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors: [error.message] }, { status: 500 });
   }
 
-  await sendNotificationEmail(getResendClient(), row);
+  try {
+    await sendNotificationEmail(getResendClient(), row);
+  } catch (error) {
+    console.error('Failed to send notification email:', error);
+  }
 
   return NextResponse.json({ ok: true });
 }

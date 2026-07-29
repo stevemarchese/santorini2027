@@ -17,11 +17,15 @@ export interface ResponseRow {
   note: string | null;
 }
 
+function asTrimmedString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 export function validateDraftForSubmit(draft: DraftResponse): string[] {
   const errors: string[] = [];
-  if (!draft.name.trim()) errors.push('Name is required');
-  if (draft.attending === null) errors.push('Attending is required');
-  if (draft.attending === true && (draft.partySize === null || draft.partySize < 1)) {
+  if (typeof draft?.name !== 'string' || !draft.name.trim()) errors.push('Name is required');
+  if (!draft || draft.attending === null || draft.attending === undefined) errors.push('Attending is required');
+  if (draft?.attending === true && (draft.partySize === null || draft.partySize === undefined || draft.partySize < 1)) {
     errors.push('Party size is required when attending');
   }
   return errors;
@@ -30,7 +34,7 @@ export function validateDraftForSubmit(draft: DraftResponse): string[] {
 export function buildResponseRow(draft: DraftResponse): ResponseRow {
   const attending = draft.attending === true;
   return {
-    name: draft.name.trim(),
+    name: asTrimmedString(draft.name),
     attending,
     party_size: attending ? draft.partySize : null,
     hotel_staying: attending ? draft.hotelStaying : null,
@@ -40,9 +44,9 @@ export function buildResponseRow(draft: DraftResponse): ResponseRow {
     window_3_selected: attending ? draft.window3Selected : false,
     window_priority: attending ? draft.windowPriority : null,
     travel_timing: attending ? draft.travelTiming : null,
-    travel_note: attending && draft.travelNote.trim() ? draft.travelNote.trim() : null,
+    travel_note: attending ? asTrimmedString(draft.travelNote) || null : null,
     dinner_interested: attending ? draft.dinnerInterested : null,
     cruise_interested: attending ? draft.cruiseInterested : null,
-    note: draft.note.trim() ? draft.note.trim() : null,
+    note: asTrimmedString(draft.note) || null,
   };
 }

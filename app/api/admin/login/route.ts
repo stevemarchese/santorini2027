@@ -2,7 +2,12 @@ import { NextResponse } from 'next/server';
 import { hashAdminPassword } from '@/lib/admin-auth';
 
 export async function POST(request: Request) {
-  const { password } = (await request.json()) as { password: string };
+  let password: string;
+  try {
+    ({ password } = (await request.json()) as { password: string });
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected || password !== expected) {
     return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });

@@ -40,4 +40,15 @@ describe('getAllResponses', () => {
     expect(order).toHaveBeenCalledWith('created_at', { ascending: false });
     expect(result).toEqual([{ id: '1' }]);
   });
+
+  it('returns an empty array instead of null when data is null', async () => {
+    const order = vi.fn().mockResolvedValue({ data: null, error: null });
+    const select = vi.fn(() => ({ order }));
+    fromMock.mockReturnValue({ select });
+
+    const { getAllResponses } = await import('./supabase-admin');
+    const result = await getAllResponses();
+
+    expect(result).toEqual([]);
+  });
 });

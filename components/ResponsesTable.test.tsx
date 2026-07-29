@@ -20,7 +20,7 @@ describe('ResponsesTable', () => {
             window_3_selected: false,
             window_priority: 'window_1',
             travel_timing: 'both',
-            travel_note: null,
+            travel_note: 'Flying in a day early',
             dinner_interested: true,
             cruise_interested: false,
             note: null,
@@ -30,5 +30,7 @@ describe('ResponsesTable', () => {
     );
     expect(screen.getByText('Steve')).toBeInTheDocument();
     expect(screen.getByText('6/30-7/6')).toBeInTheDocument();
+    expect(screen.getByText('Flying in a day early')).toBeInTheDocument();
+    expect(screen.getByText(new Date('2026-07-29T00:00:00Z').toLocaleDateString())).toBeInTheDocument();
   });
 });

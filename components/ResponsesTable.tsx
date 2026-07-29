@@ -9,6 +9,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
     <table className="w-full border-collapse text-sm text-cream">
       <thead>
         <tr className="border-b border-cream/35 text-left uppercase text-sage">
+          <th className="p-2">Submitted</th>
           <th className="p-2">Name</th>
           <th className="p-2">Attending</th>
           <th className="p-2">Party</th>
@@ -16,6 +17,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
           <th className="p-2">Windows</th>
           <th className="p-2">Priority</th>
           <th className="p-2">Travel</th>
+          <th className="p-2">Travel Note</th>
           <th className="p-2">Dinner</th>
           <th className="p-2">Cruise</th>
           <th className="p-2">Note</th>
@@ -24,6 +26,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
       <tbody>
         {responses.map((row) => (
           <tr key={row.id} className="border-b border-cream/10">
+            <td className="p-2">{new Date(row.created_at).toLocaleDateString()}</td>
             <td className="p-2">{row.name}</td>
             <td className="p-2">{row.attending ? 'Yes' : 'No'}</td>
             <td className="p-2">{row.party_size ?? '—'}</td>
@@ -37,6 +40,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
             </td>
             <td className="p-2">{row.window_priority ?? '—'}</td>
             <td className="p-2">{row.travel_timing ?? '—'}</td>
+            <td className="p-2">{row.travel_note ?? '—'}</td>
             <td className="p-2">{row.dinner_interested ? 'Yes' : '—'}</td>
             <td className="p-2">{row.cruise_interested ? 'Yes' : '—'}</td>
             <td className="p-2">{row.note ?? '—'}</td>

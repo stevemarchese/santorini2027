@@ -18,6 +18,26 @@ describe('validateDraftForSubmit', () => {
       validateDraftForSubmit({ ...EMPTY_DRAFT, name: 'Steve', attending: true })
     ).toContain('Party size is required when attending');
   });
+
+  it('does not throw on an empty object payload', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => validateDraftForSubmit({} as any)).not.toThrow();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(validateDraftForSubmit({} as any)).toEqual(
+      expect.arrayContaining(['Name is required', 'Attending is required'])
+    );
+  });
+
+  it('does not throw when name is a number instead of a string', () => {
+    expect(() =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      validateDraftForSubmit({ ...EMPTY_DRAFT, name: 123 as any })
+    ).not.toThrow();
+    expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      validateDraftForSubmit({ ...EMPTY_DRAFT, name: 123 as any })
+    ).toContain('Name is required');
+  });
 });
 
 describe('buildResponseRow', () => {

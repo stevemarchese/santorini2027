@@ -16,7 +16,7 @@ export default async function AdminPage() {
 
   const responses = await getAllResponses();
   return (
-    <main className="min-h-dvh overflow-auto bg-navy p-8">
+    <main className="h-dvh overflow-auto bg-navy p-8">
       <ResponsesTable responses={responses} />
     </main>
   );

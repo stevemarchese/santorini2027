@@ -18,5 +18,5 @@ export async function getAllResponses() {
     .select('*')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
-  return data;
+  return data ?? [];
 }
