@@ -13,12 +13,16 @@ export default function ClosingModule({ draft }: ClosingModuleProps) {
 
   async function handleSubmit() {
     setStatus('sending');
-    const response = await fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...draft, note }),
-    });
-    setStatus(response.ok ? 'sent' : 'error');
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...draft, note }),
+      });
+      setStatus(response.ok ? 'sent' : 'error');
+    } catch {
+      setStatus('error');
+    }
   }
 
   if (status === 'sent') {

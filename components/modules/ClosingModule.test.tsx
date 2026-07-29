@@ -27,4 +27,15 @@ describe('ClosingModule', () => {
     render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }} />);
     expect(screen.getByText(/sorry to miss you/i)).toBeInTheDocument();
   });
+
+  it('shows the error state and re-enables Send when fetch rejects (network error)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
+    const user = userEvent.setup();
+    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }} />);
+
+    await user.click(screen.getByRole('button', { name: /^send$/i }));
+
+    expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^send$/i })).not.toBeDisabled();
+  });
 });
