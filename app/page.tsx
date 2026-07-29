@@ -1,0 +1,22 @@
+'use client';
+import { useState } from 'react';
+import Hero from '@/components/Hero';
+import { getNextModule } from '@/lib/flow';
+import { EMPTY_DRAFT } from '@/lib/types';
+import type { DraftResponse, ModuleId } from '@/lib/types';
+
+export default function Home() {
+  const [moduleId, setModuleId] = useState<ModuleId>('opening');
+  const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
+
+  function advance(updated: DraftResponse) {
+    setDraft(updated);
+    setModuleId(getNextModule(moduleId, updated));
+  }
+
+  return (
+    <main>
+      <Hero />
+    </main>
+  );
+}
