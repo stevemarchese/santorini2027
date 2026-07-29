@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Hero from '@/components/Hero';
 import OpeningModule from '@/components/modules/OpeningModule';
 import HotelModule from '@/components/modules/HotelModule';
+import DateWindowsModule from '@/components/modules/DateWindowsModule';
 import { getNextModule } from '@/lib/flow';
 import { EMPTY_DRAFT } from '@/lib/types';
 import type { DraftResponse, ModuleId } from '@/lib/types';
@@ -21,6 +22,7 @@ export default function Home() {
       <Hero />
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
       {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
+      {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} />}
     </main>
   );
 }
