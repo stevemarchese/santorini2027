@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #082534;
+  --color-terracotta: #8A5233;
+  --color-teal: #265F6E;
+  --color-cream: #DED5BD;
+  --color-sage: #9FB3AF;
+}
+
+@keyframes module-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-module-in {
+  animation: module-in 350ms ease-out;
+}
