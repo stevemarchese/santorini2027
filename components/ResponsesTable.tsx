@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { AdminResponse } from '@/lib/payload';
 import { sortResponses, type SortKey, type SortDirection } from '@/lib/responses-sort';
 import { buildResponsesCsv } from '@/lib/responses-export';
+import { computeResponsesStats } from '@/lib/responses-stats';
 
 interface ResponsesTableProps {
   responses: AdminResponse[];
@@ -22,13 +23,21 @@ const COLUMNS: { key: SortKey | null; label: string }[] = [
   { key: 'dinner_interested', label: 'Dinner' },
   { key: 'cruise_interested', label: 'Cruise' },
   { key: null, label: 'Note' },
+  { key: null, label: '' },
 ];
 
+const WINDOW_LABELS = { window_1: '6/30-7/6', window_2: '7/7-7/13', window_3: '7/14-7/18' } as const;
+const WINDOW_KEYS = Object.keys(WINDOW_LABELS) as (keyof typeof WINDOW_LABELS)[];
+
 export default function ResponsesTable({ responses }: ResponsesTableProps) {
+  const [items, setItems] = useState(responses);
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
   const [sortDir, setSortDir] = useState<SortDirection>('desc');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const sorted = sortResponses(responses, sortKey, sortDir);
+  const sorted = sortResponses(items, sortKey, sortDir);
+  const stats = computeResponsesStats(items);
 
   function handleSort(key: SortKey) {
     if (key === sortKey) {
@@ -40,7 +49,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   }
 
   function handleDownload() {
-    const csv = buildResponsesCsv(responses);
+    const csv = buildResponsesCsv(items);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -52,10 +61,48 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
     URL.revokeObjectURL(url);
   }
 
+  async function handleDelete(row: AdminResponse) {
+    if (!window.confirm(`Delete ${row.name}'s response? This can't be undone.`)) return;
+    setDeleteError(null);
+    setDeletingId(row.id);
+    try {
+      const res = await fetch(`/api/admin/responses/${row.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setItems((current) => current.filter((r) => r.id !== row.id));
+      } else {
+        setDeleteError(`Couldn't delete ${row.name}'s response — try again.`);
+      }
+    } catch {
+      setDeleteError(`Couldn't delete ${row.name}'s response — try again.`);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div>
+      <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-sage">
+        <span>
+          Attending: {stats.totalAttending} / {stats.totalResponses}
+        </span>
+        <span>Avg hotel stay: {stats.avgHotelNights == null ? '—' : `${stats.avgHotelNights} nights`}</span>
+        <span>
+          Window priority:{' '}
+          {WINDOW_KEYS.map((key, i) => (
+            <span key={key} className={stats.topPriorityWindow === key ? 'font-bold text-cream' : undefined}>
+              {i > 0 ? ' · ' : ''}
+              {WINDOW_LABELS[key]} {stats.windowPriorityCounts[key]}
+            </span>
+          ))}
+        </span>
+        <span>Dinner: {stats.dinnerYesCount} yes</span>
+        <span>Cruise: {stats.cruiseYesCount} yes</span>
+      </div>
+
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-sage">{responses.length} response{responses.length === 1 ? '' : 's'}</span>
+        <span className="text-sm text-sage">
+          {items.length} response{items.length === 1 ? '' : 's'}
+        </span>
         <button
           type="button"
           onClick={handleDownload}
@@ -64,6 +111,9 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
           Download CSV
         </button>
       </div>
+
+      {deleteError && <p className="mb-2 text-sm text-terracotta">{deleteError}</p>}
+
       <table className="w-full border-collapse text-sm text-cream">
         <thead>
           <tr className="border-b border-cream/35 text-left uppercase text-sage">
@@ -106,6 +156,16 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
               <td className="p-2">{row.dinner_interested ? 'Yes' : '—'}</td>
               <td className="p-2">{row.cruise_interested ? 'Yes' : '—'}</td>
               <td className="p-2">{row.note ?? '—'}</td>
+              <td className="p-2">
+                <button
+                  type="button"
+                  onClick={() => handleDelete(row)}
+                  disabled={deletingId === row.id}
+                  className="rounded border border-cream/35 px-2 py-1 text-xs text-cream hover:border-terracotta hover:text-terracotta disabled:opacity-40"
+                >
+                  {deletingId === row.id ? 'Deleting…' : 'Delete'}
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
