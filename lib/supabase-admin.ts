@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { AdminResponse } from './payload';
 
 export function getSupabaseAdminClient() {
   const url = process.env.SUPABASE_URL;
@@ -11,12 +12,12 @@ export function getSupabaseAdminClient() {
   });
 }
 
-export async function getAllResponses() {
+export async function getAllResponses(): Promise<AdminResponse[]> {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from('responses')
     .select('*')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
-  return data ?? [];
+  return (data ?? []) as AdminResponse[];
 }
