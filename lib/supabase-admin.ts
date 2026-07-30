@@ -21,3 +21,9 @@ export async function getAllResponses(): Promise<AdminResponse[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as AdminResponse[];
 }
+
+export async function deleteResponse(id: string): Promise<{ error: string | null }> {
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from('responses').delete().eq('id', id);
+  return { error: error?.message ?? null };
+}

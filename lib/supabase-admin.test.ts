@@ -52,3 +52,35 @@ describe('getAllResponses', () => {
     expect(result).toEqual([]);
   });
 });
+
+describe('deleteResponse', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    process.env.SUPABASE_URL = 'https://example.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+  });
+
+  it('deletes by id and returns no error on success', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: null });
+    const del = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ delete: del });
+
+    const { deleteResponse } = await import('./supabase-admin');
+    const result = await deleteResponse('abc-123');
+
+    expect(fromMock).toHaveBeenCalledWith('responses');
+    expect(eq).toHaveBeenCalledWith('id', 'abc-123');
+    expect(result).toEqual({ error: null });
+  });
+
+  it('returns the error message on failure', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: { message: 'boom' } });
+    const del = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ delete: del });
+
+    const { deleteResponse } = await import('./supabase-admin');
+    const result = await deleteResponse('abc-123');
+
+    expect(result).toEqual({ error: 'boom' });
+  });
+});
