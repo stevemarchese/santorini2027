@@ -63,7 +63,7 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
               }
             : undefined
         }
-        className="animate-module-in blob-panel min-h-0 max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.82] p-10 backdrop-blur-md md:ml-[100px]"
+        className="animate-module-in blob-panel min-h-0 max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.82] p-10 backdrop-blur-md ml-[100px]"
       >
         {children}
       </div>
