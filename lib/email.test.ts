@@ -47,4 +47,24 @@ describe('sendNotificationEmail', () => {
       })
     );
   });
+
+  it('splits a comma-separated NOTIFY_EMAIL into multiple recipients', async () => {
+    const originalNotifyEmail = process.env.NOTIFY_EMAIL;
+    process.env.NOTIFY_EMAIL = 'steve.marchese@gmail.com, andi@example.com ,  ';
+
+    const send = vi.fn().mockResolvedValue({ id: 'abc' });
+    const row = buildResponseRow({ ...EMPTY_DRAFT, name: 'Steve', attending: false });
+
+    try {
+      await sendNotificationEmail({ emails: { send } }, row);
+
+      expect(send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: ['steve.marchese@gmail.com', 'andi@example.com'],
+        })
+      );
+    } finally {
+      process.env.NOTIFY_EMAIL = originalNotifyEmail;
+    }
+  });
 });

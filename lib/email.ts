@@ -26,7 +26,7 @@ export function buildNotificationEmailText(row: ResponseRow): string {
 
 interface ResendEmailPayload {
   from: string;
-  to: string;
+  to: string[];
   subject: string;
   text: string;
 }
@@ -35,12 +35,19 @@ interface ResendLikeClient {
   emails: { send: (payload: ResendEmailPayload) => Promise<unknown> };
 }
 
+function parseNotifyRecipients(): string[] {
+  const raw = process.env.NOTIFY_EMAIL ?? 'steve.marchese@gmail.com';
+  return raw
+    .split(',')
+    .map((email) => email.trim())
+    .filter((email) => email.length > 0);
+}
+
 export async function sendNotificationEmail(client: ResendLikeClient, row: ResponseRow): Promise<void> {
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
-  const toEmail = process.env.NOTIFY_EMAIL ?? 'steve.marchese@gmail.com';
   await client.emails.send({
     from: `Santorini 2027 <${fromEmail}>`,
-    to: toEmail,
+    to: parseNotifyRecipients(),
     subject: `New RSVP: ${row.name} (${row.attending ? 'attending' : 'not attending'})`,
     text: buildNotificationEmailText(row),
   });
