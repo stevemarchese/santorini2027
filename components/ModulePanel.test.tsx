@@ -35,4 +35,18 @@ describe('ModulePanel', () => {
     fireEvent.pointerMove(panel, { clientX: 40, clientY: 20, pointerId: 1 });
     expect(panel.style.transform).toBe('translate(40px, 20px)');
   });
+
+  it('clamps the offset so the panel cannot be dragged fully off-screen', () => {
+    const { container } = render(
+      <ModulePanel draggable>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    // jsdom's default viewport is 1024x768, so maxX = 1024/2 - 80 = 432, maxY = 768/2 - 80 = 304.
+    // Drag far past those limits and confirm the offset is clamped, not raw.
+    fireEvent.pointerDown(panel, { clientX: 0, clientY: 0, pointerId: 1 });
+    fireEvent.pointerMove(panel, { clientX: 2000, clientY: 2000, pointerId: 1 });
+    expect(panel.style.transform).toBe('translate(432px, 304px)');
+  });
 });
