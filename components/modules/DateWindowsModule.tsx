@@ -20,7 +20,8 @@ export default function DateWindowsModule({ draft, onAdvance }: DateWindowsModul
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">Which weeks could work?</h2>
+      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">Which weeks could work? *</h2>
+      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <p className="mt-1 text-xs text-sage">Select all that apply — if more than one works, you can flag your favorite below.</p>
       <div className="mt-4 flex flex-col gap-3">
         {WINDOWS.map(({ key, label, field }) => (

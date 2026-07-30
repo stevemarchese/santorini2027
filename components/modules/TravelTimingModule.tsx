@@ -22,8 +22,9 @@ export default function TravelTimingModule({ draft, onAdvance }: TravelTimingMod
   return (
     <ModulePanel>
       <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
-        Traveling before or after Santorini?
+        Traveling before or after Santorini? *
       </h2>
+      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <div className="mt-4 flex flex-wrap gap-3">
         {OPTIONS.map(({ value, label }) => (
           <button

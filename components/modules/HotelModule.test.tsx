@@ -20,4 +20,10 @@ describe('HotelModule', () => {
       expect.objectContaining({ hotelStaying: true, hotelNights: 4 })
     );
   });
+
+  it('shows a required-field legend and asterisk on the staying question', () => {
+    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    expect(screen.getByText('*required')).toBeInTheDocument();
+    expect(screen.getByText('Staying at the Adamastos Hotel? *')).toBeInTheDocument();
+  });
 });

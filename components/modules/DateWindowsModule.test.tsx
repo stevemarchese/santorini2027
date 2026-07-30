@@ -18,4 +18,10 @@ describe('DateWindowsModule', () => {
       expect.objectContaining({ window2Selected: true, windowPriority: 'window_2' })
     );
   });
+
+  it('shows a required-field legend and asterisk on the heading', () => {
+    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    expect(screen.getByText('*required')).toBeInTheDocument();
+    expect(screen.getByText('Which weeks could work? *')).toBeInTheDocument();
+  });
 });

@@ -15,8 +15,9 @@ export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
   return (
     <ModulePanel>
       <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
-        Staying at the Adamastos Hotel?
+        Staying at the Adamastos Hotel? *
       </h2>
+      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <div className="mt-4 flex gap-3">
         <button
           type="button"
@@ -40,7 +41,7 @@ export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
       {local.hotelStaying === true && (
         <>
           <label htmlFor="hotelNights" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-            How many nights?
+            How many nights? *
           </label>
           <input
             id="hotelNights"

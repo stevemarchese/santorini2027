@@ -18,4 +18,10 @@ describe('TravelTimingModule', () => {
       expect.objectContaining({ travelTiming: 'both', travelNote: 'Flying in early' })
     );
   });
+
+  it('shows a required-field legend and asterisk on the heading', () => {
+    render(<TravelTimingModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    expect(screen.getByText('*required')).toBeInTheDocument();
+    expect(screen.getByText('Traveling before or after Santorini? *')).toBeInTheDocument();
+  });
 });

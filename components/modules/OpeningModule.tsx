@@ -29,8 +29,9 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
       <h1 className="mt-2 text-xl font-bold uppercase tracking-wide text-cream">
         Join us in Santorini
       </h1>
+      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <label htmlFor="name" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-        Your name
+        Your name *
       </label>
       <input
         id="name"
@@ -38,7 +39,7 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
         value={local.name}
         onChange={(event) => setLocal({ ...local, name: event.target.value })}
       />
-      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you coming?</p>
+      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you coming? *</p>
       <div className="mt-2 flex gap-3">
         <button
           type="button"

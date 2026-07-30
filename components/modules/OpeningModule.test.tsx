@@ -46,4 +46,11 @@ describe('OpeningModule', () => {
     expect(screen.getByRole('button', { name: '+4' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '+5' })).toBeInTheDocument();
   });
+
+  it('shows a required-field legend and asterisks on Name and Are you coming?', () => {
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    expect(screen.getByText('*required')).toBeInTheDocument();
+    expect(screen.getByText('Your name *')).toBeInTheDocument();
+    expect(screen.getByText('Are you coming? *')).toBeInTheDocument();
+  });
 });
