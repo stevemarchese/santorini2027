@@ -1,8 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ModulePanel from './ModulePanel';
 
+function setViewportWidth(width: number) {
+  Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: width });
+}
+
 describe('ModulePanel', () => {
+  const originalInnerWidth = window.innerWidth;
+  afterEach(() => {
+    setViewportWidth(originalInnerWidth);
+  });
+
   it('renders its children', () => {
     render(
       <ModulePanel>
@@ -63,6 +72,19 @@ describe('ModulePanel', () => {
     // draggable=true always renders a transform from offset state, so the untouched
     // baseline is 'translate(0px, 0px)' rather than ''. What matters is that the
     // 50,50 pointermove had no effect, proving the guard clause blocked the drag.
+    expect(panel.style.transform).toBe('translate(0px, 0px)');
+  });
+
+  it('does not drag on mobile viewport widths, staying centered', () => {
+    setViewportWidth(390);
+    const { container } = render(
+      <ModulePanel draggable>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    fireEvent.pointerDown(panel, { clientX: 0, clientY: 0, pointerId: 1 });
+    fireEvent.pointerMove(panel, { clientX: 50, clientY: 50, pointerId: 1 });
     expect(panel.style.transform).toBe('translate(0px, 0px)');
   });
 });

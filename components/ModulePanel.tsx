@@ -11,6 +11,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 const INTERACTIVE_SELECTOR = 'input, button, textarea, select, a, label';
+const MOBILE_BREAKPOINT_PX = 640;
 
 export default function ModulePanel({ children, draggable = false }: ModulePanelProps) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -19,6 +20,7 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggable) return;
+    if (window.innerWidth < MOBILE_BREAKPOINT_PX) return;
     if ((event.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
     dragState.current = {
       startX: event.clientX,

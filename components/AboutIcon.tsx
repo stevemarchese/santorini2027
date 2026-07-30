@@ -25,10 +25,10 @@ export default function AboutIcon({ visible }: AboutIconProps) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="About this trip"
-        className="fixed left-4 top-4 z-20 flex flex-col items-center text-cream"
+        className="fixed left-4 top-4 z-20 flex flex-col items-center text-terracotta"
       >
         <LetterGlyph className="h-7 w-7" />
-        <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-cream">About</span>
+        <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-terracotta">About</span>
       </button>
       {open && (
         <div className="fixed inset-0 z-30 flex items-center justify-center p-6">
