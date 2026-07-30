@@ -48,6 +48,17 @@ describe('sendNotificationEmail', () => {
     );
   });
 
+  it('throws when the Resend client resolves with an error', async () => {
+    const send = vi.fn().mockResolvedValue({
+      error: { name: 'validation_error', message: 'You can only send testing emails to your own email address' },
+    });
+    const row = buildResponseRow({ ...EMPTY_DRAFT, name: 'Steve', attending: false });
+
+    await expect(sendNotificationEmail({ emails: { send } }, row)).rejects.toThrow(
+      /Resend send failed/
+    );
+  });
+
   it('splits a comma-separated NOTIFY_EMAIL into multiple recipients', async () => {
     const originalNotifyEmail = process.env.NOTIFY_EMAIL;
     process.env.NOTIFY_EMAIL = 'steve.marchese@gmail.com, andi@example.com ,  ';

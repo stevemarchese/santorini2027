@@ -31,8 +31,12 @@ interface ResendEmailPayload {
   text: string;
 }
 
+interface ResendSendResult {
+  error?: { message?: string; name?: string } | null;
+}
+
 interface ResendLikeClient {
-  emails: { send: (payload: ResendEmailPayload) => Promise<unknown> };
+  emails: { send: (payload: ResendEmailPayload) => Promise<ResendSendResult> };
 }
 
 function parseNotifyRecipients(): string[] {
@@ -45,10 +49,17 @@ function parseNotifyRecipients(): string[] {
 
 export async function sendNotificationEmail(client: ResendLikeClient, row: ResponseRow): Promise<void> {
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
-  await client.emails.send({
+  const result = await client.emails.send({
     from: `Santorini 2027 <${fromEmail}>`,
     to: parseNotifyRecipients(),
     subject: `New RSVP: ${row.name} (${row.attending ? 'attending' : 'not attending'})`,
     text: buildNotificationEmailText(row),
   });
+
+  // The Resend SDK resolves with an { error } object on API failures rather than
+  // throwing — so an unverified sender or disallowed recipient would otherwise
+  // fail silently. Surface it so the caller's catch logs a real error.
+  if (result?.error) {
+    throw new Error(`Resend send failed: ${result.error.message ?? result.error.name ?? 'unknown error'}`);
+  }
 }
