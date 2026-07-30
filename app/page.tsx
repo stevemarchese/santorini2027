@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Hero from '@/components/Hero';
+import AboutIcon from '@/components/AboutIcon';
 import LetterModule from '@/components/modules/LetterModule';
 import OpeningModule from '@/components/modules/OpeningModule';
 import HotelModule from '@/components/modules/HotelModule';
@@ -24,6 +25,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <AboutIcon visible={moduleId !== 'letter'} />
       {moduleId === 'letter' && <LetterModule draft={draft} onAdvance={advance} />}
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
       {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
