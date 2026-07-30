@@ -17,10 +17,18 @@ import type { DraftResponse, ModuleId } from '@/lib/types';
 export default function Home() {
   const [moduleId, setModuleId] = useState<ModuleId>('letter');
   const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
+  const [history, setHistory] = useState<ModuleId[]>([]);
 
   function advance(updated: DraftResponse) {
     setDraft(updated);
+    setHistory([...history, moduleId]);
     setModuleId(getNextModule(moduleId, updated));
+  }
+
+  function goBack() {
+    if (history.length === 0) return;
+    setModuleId(history[history.length - 1]);
+    setHistory(history.slice(0, -1));
   }
 
   return (
@@ -30,11 +38,11 @@ export default function Home() {
       <WeatherWidget />
       {moduleId === 'letter' && <LetterModule draft={draft} onAdvance={advance} />}
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'dinnerCruise' && <DinnerCruiseModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'closing' && <ClosingModule draft={draft} />}
+      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'dinnerCruise' && <DinnerCruiseModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'closing' && <ClosingModule draft={draft} onBack={goBack} />}
     </main>
   );
 }

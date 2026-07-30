@@ -8,20 +8,29 @@ describe('DateWindowsModule', () => {
   it('selects a window, auto-marks it as top pick, and advances', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
-    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
+    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={onAdvance} onBack={vi.fn()} />);
 
     await user.click(screen.getByLabelText(/7\/7 – 7\/13/));
     expect(screen.getByText(/top pick/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /^next/i }));
     expect(onAdvance).toHaveBeenCalledWith(
       expect.objectContaining({ window2Selected: true, windowPriority: 'window_2' })
     );
   });
 
-  it('shows a required-field legend and asterisk on the heading', () => {
-    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
-    expect(screen.getByText('*required')).toBeInTheDocument();
-    expect(screen.getByText('Which weeks could work? *')).toBeInTheDocument();
+  it('shows an asterisk on the heading', () => {
+    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.getByText('Which week works best for you? *')).toBeInTheDocument();
+  });
+
+  it('calls onBack when the Back button is clicked', async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<DateWindowsModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={onBack} />);
+
+    await user.click(screen.getByRole('button', { name: /back/i }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

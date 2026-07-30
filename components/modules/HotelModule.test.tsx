@@ -8,22 +8,46 @@ describe('HotelModule', () => {
   it('requires nights when staying, then advances', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
-    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
+    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={onAdvance} onBack={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /^yes$/i }));
-    expect(screen.getByRole('button', { name: /^next$/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
 
-    await user.type(screen.getByLabelText(/how many nights/i), '4');
-    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: '4' }));
+    await user.click(screen.getByRole('button', { name: /^next/i }));
 
     expect(onAdvance).toHaveBeenCalledWith(
       expect.objectContaining({ hotelStaying: true, hotelNights: 4 })
     );
   });
 
-  it('shows a required-field legend and asterisk on the staying question', () => {
-    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
-    expect(screen.getByText('*required')).toBeInTheDocument();
-    expect(screen.getByText('Staying at the Adamastos Hotel? *')).toBeInTheDocument();
+  it('offers seven nights pills, the last one labeled 7+', async () => {
+    const user = userEvent.setup();
+    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /^yes$/i }));
+
+    expect(screen.getByRole('button', { name: '1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '3' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '4' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '5' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '6' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '7+' })).toBeInTheDocument();
+  });
+
+  it('shows an asterisk on the staying question', () => {
+    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.getByText('Do you plan on staying at the Adamastos Hotel? *')).toBeInTheDocument();
+  });
+
+  it('calls onBack when the Back button is clicked', async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={onBack} />);
+
+    await user.click(screen.getByRole('button', { name: /back/i }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

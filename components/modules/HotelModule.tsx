@@ -4,26 +4,36 @@ import ModulePanel from '@/components/ModulePanel';
 import { canAdvanceFromHotel } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
 
+const NIGHTS_OPTIONS: { value: number; label: string }[] = [
+  { value: 1, label: '1' },
+  { value: 2, label: '2' },
+  { value: 3, label: '3' },
+  { value: 4, label: '4' },
+  { value: 5, label: '5' },
+  { value: 6, label: '6' },
+  { value: 7, label: '7+' },
+];
+
 interface HotelModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
+  onBack: () => void;
 }
 
-export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
+export default function HotelModule({ draft, onAdvance, onBack }: HotelModuleProps) {
   const [local, setLocal] = useState(draft);
 
   return (
     <ModulePanel>
       <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
-        Staying at the Adamastos Hotel? *
+        Do you plan on staying at the Adamastos Hotel? *
       </h2>
-      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <div className="mt-4 flex gap-3">
         <button
           type="button"
           onClick={() => setLocal({ ...local, hotelStaying: true })}
-          className={`px-5 py-2 text-xs font-bold uppercase tracking-wide ${
-            local.hotelStaying === true ? 'bg-terracotta text-cream' : 'border border-teal text-teal'
+          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+            local.hotelStaying === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
           Yes
@@ -31,8 +41,8 @@ export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
         <button
           type="button"
           onClick={() => setLocal({ ...local, hotelStaying: false, hotelNights: null })}
-          className={`px-5 py-2 text-xs font-bold uppercase tracking-wide ${
-            local.hotelStaying === false ? 'bg-terracotta text-cream' : 'border border-teal text-teal'
+          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+            local.hotelStaying === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
           No
@@ -40,29 +50,40 @@ export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
       </div>
       {local.hotelStaying === true && (
         <>
-          <label htmlFor="hotelNights" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-            How many nights? *
-          </label>
-          <input
-            id="hotelNights"
-            type="number"
-            min={1}
-            className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
-            value={local.hotelNights ?? ''}
-            onChange={(event) =>
-              setLocal({ ...local, hotelNights: event.target.value ? Number(event.target.value) : null })
-            }
-          />
+          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">For how many nights? *</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {NIGHTS_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setLocal({ ...local, hotelNights: value })}
+                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
+                  local.hotelNights === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </>
       )}
-      <button
-        type="button"
-        onClick={() => onAdvance(local)}
-        disabled={!canAdvanceFromHotel(local)}
-        className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream disabled:opacity-40"
-      >
-        Next
-      </button>
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm font-semibold uppercase tracking-wide text-sage"
+        >
+          <span className="animate-arrow-bob">←</span> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => onAdvance(local)}
+          disabled={!canAdvanceFromHotel(local)}
+          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
+        >
+          Next <span className="animate-arrow-bob">→</span>
+        </button>
+      </div>
     </ModulePanel>
   );
 }

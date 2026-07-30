@@ -14,7 +14,7 @@ describe('LetterModule', () => {
     expect(screen.getByText(LETTER_PARAGRAPHS[0])).toBeInTheDocument();
     expect(screen.getByText(LETTER_PARAGRAPHS[LETTER_PARAGRAPHS.length - 1])).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /^next/i }));
 
     expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
   });

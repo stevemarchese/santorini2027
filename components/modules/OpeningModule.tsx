@@ -23,13 +23,12 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
 
   return (
     <ModulePanel draggable>
-      <p className="text-xs font-bold uppercase tracking-widest text-cream/70">
-        20 years — July 4, 2007
-      </p>
-      <h1 className="mt-2 text-xl font-bold uppercase tracking-wide text-cream">
+      <h1 className="text-xl font-bold uppercase tracking-wide text-cream">
         Join us in Santorini
       </h1>
-      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
+      <p className="mt-2 text-xs font-bold uppercase tracking-widest text-cream/70">
+        20 years — 2007 to 2027
+      </p>
       <label htmlFor="name" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
         Your name *
       </label>
@@ -39,12 +38,12 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
         value={local.name}
         onChange={(event) => setLocal({ ...local, name: event.target.value })}
       />
-      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you coming? *</p>
+      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you planning on coming? *</p>
       <div className="mt-2 flex gap-3">
         <button
           type="button"
           onClick={() => setLocal({ ...local, attending: true })}
-          className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wide ${
+          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
             local.attending === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
@@ -53,7 +52,7 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
         <button
           type="button"
           onClick={() => setLocal({ ...local, attending: false, partySize: null })}
-          className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wide ${
+          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
             local.attending === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
@@ -62,14 +61,14 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
       </div>
       {local.attending === true && (
         <>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Party size *</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
+          <div className="mt-3 flex flex-wrap gap-3">
             {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setLocal({ ...local, partySize: value })}
-                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide ${
+                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
                   local.partySize === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
                 }`}
               >
@@ -79,14 +78,17 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
           </div>
         </>
       )}
-      <button
-        type="button"
-        onClick={() => onAdvance(local)}
-        disabled={!canAdvanceFromOpening(local)}
-        className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream disabled:opacity-40"
-      >
-        Next
-      </button>
+      <div className="mt-6 flex items-center justify-between">
+        <p className="text-[10px] uppercase tracking-widest text-sage/70">*required</p>
+        <button
+          type="button"
+          onClick={() => onAdvance(local)}
+          disabled={!canAdvanceFromOpening(local)}
+          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
+        >
+          Next <span className="animate-arrow-bob">→</span>
+        </button>
+      </div>
     </ModulePanel>
   );
 }

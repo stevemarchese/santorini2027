@@ -7,6 +7,7 @@ import type { DraftResponse, WindowKey } from '@/lib/types';
 interface DateWindowsModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
+  onBack: () => void;
 }
 
 const WINDOWS: { key: WindowKey; label: string; field: 'window1Selected' | 'window2Selected' | 'window3Selected' }[] = [
@@ -15,13 +16,12 @@ const WINDOWS: { key: WindowKey; label: string; field: 'window1Selected' | 'wind
   { key: 'window_3', label: '7/14 – 7/18', field: 'window3Selected' },
 ];
 
-export default function DateWindowsModule({ draft, onAdvance }: DateWindowsModuleProps) {
+export default function DateWindowsModule({ draft, onAdvance, onBack }: DateWindowsModuleProps) {
   const [local, setLocal] = useState(draft);
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">Which weeks could work? *</h2>
-      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
+      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">Which week works best for you? *</h2>
       <p className="mt-1 text-xs text-sage">Select all that apply — if more than one works, you can flag your favorite below.</p>
       <div className="mt-4 flex flex-col gap-3">
         {WINDOWS.map(({ key, label, field }) => (
@@ -48,14 +48,23 @@ export default function DateWindowsModule({ draft, onAdvance }: DateWindowsModul
           </div>
         ))}
       </div>
-      <button
-        type="button"
-        onClick={() => onAdvance(local)}
-        disabled={!canAdvanceFromDateWindows(local)}
-        className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream disabled:opacity-40"
-      >
-        Next
-      </button>
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm font-semibold uppercase tracking-wide text-sage"
+        >
+          <span className="animate-arrow-bob">←</span> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => onAdvance(local)}
+          disabled={!canAdvanceFromDateWindows(local)}
+          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
+        >
+          Next <span className="animate-arrow-bob">→</span>
+        </button>
+      </div>
     </ModulePanel>
   );
 }

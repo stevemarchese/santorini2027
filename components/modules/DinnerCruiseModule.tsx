@@ -6,9 +6,10 @@ import type { DraftResponse } from '@/lib/types';
 interface DinnerCruiseModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
+  onBack: () => void;
 }
 
-export default function DinnerCruiseModule({ draft, onAdvance }: DinnerCruiseModuleProps) {
+export default function DinnerCruiseModule({ draft, onAdvance, onBack }: DinnerCruiseModuleProps) {
   const [local, setLocal] = useState(draft);
 
   return (
@@ -20,7 +21,7 @@ export default function DinnerCruiseModule({ draft, onAdvance }: DinnerCruiseMod
           checked={local.dinnerInterested}
           onChange={(event) => setLocal({ ...local, dinnerInterested: event.target.checked })}
         />
-        Interested in the group dinner?
+        Would you be interested in a group dinner?
       </label>
       <label className="mt-3 flex items-center gap-2 text-sm text-cream">
         <input
@@ -28,15 +29,24 @@ export default function DinnerCruiseModule({ draft, onAdvance }: DinnerCruiseMod
           checked={local.cruiseInterested}
           onChange={(event) => setLocal({ ...local, cruiseInterested: event.target.checked })}
         />
-        Interested in the sunset cruise?
+        Would you join us for a sunset cruise and swim?
       </label>
-      <button
-        type="button"
-        onClick={() => onAdvance(local)}
-        className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream"
-      >
-        Next
-      </button>
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm font-semibold uppercase tracking-wide text-sage"
+        >
+          <span className="animate-arrow-bob">←</span> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => onAdvance(local)}
+          className="text-sm font-semibold uppercase tracking-wide text-sage"
+        >
+          Next <span className="animate-arrow-bob">→</span>
+        </button>
+      </div>
     </ModulePanel>
   );
 }

@@ -13,7 +13,7 @@ describe('OpeningModule', () => {
     await user.type(screen.getByLabelText(/your name/i), 'Steve');
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
     await user.click(screen.getByRole('button', { name: '+1' }));
-    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /^next/i }));
 
     expect(onAdvance).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Steve', attending: true, partySize: 2 })
@@ -22,7 +22,7 @@ describe('OpeningModule', () => {
 
   it('disables Next until required fields are filled', () => {
     render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /^next$/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
   });
 
   it('renders the unselected attending buttons as legible cream pills', () => {
@@ -47,17 +47,17 @@ describe('OpeningModule', () => {
     expect(screen.getByRole('button', { name: '+5' })).toBeInTheDocument();
   });
 
-  it('shows a required-field legend and asterisks on Name and Are you coming?', () => {
+  it('shows a required-field legend and asterisks on Name and Are you planning on coming?', () => {
     render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
     expect(screen.getByText('*required')).toBeInTheDocument();
     expect(screen.getByText('Your name *')).toBeInTheDocument();
-    expect(screen.getByText('Are you coming? *')).toBeInTheDocument();
+    expect(screen.getByText('Are you planning on coming? *')).toBeInTheDocument();
   });
 
-  it('shows an asterisk on Party size once attending is true', async () => {
+  it('shows an asterisk on the crew-size question once attending is true', async () => {
     const user = userEvent.setup();
     render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
-    expect(screen.getByText('Party size *')).toBeInTheDocument();
+    expect(screen.getByText('How many in your crew? *')).toBeInTheDocument();
   });
 });

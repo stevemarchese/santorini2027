@@ -7,6 +7,7 @@ import type { DraftResponse } from '@/lib/types';
 interface TravelTimingModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
+  onBack: () => void;
 }
 
 const OPTIONS: { value: NonNullable<DraftResponse['travelTiming']>; label: string }[] = [
@@ -16,7 +17,7 @@ const OPTIONS: { value: NonNullable<DraftResponse['travelTiming']>; label: strin
   { value: 'neither', label: 'Neither' },
 ];
 
-export default function TravelTimingModule({ draft, onAdvance }: TravelTimingModuleProps) {
+export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelTimingModuleProps) {
   const [local, setLocal] = useState(draft);
 
   return (
@@ -24,7 +25,6 @@ export default function TravelTimingModule({ draft, onAdvance }: TravelTimingMod
       <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
         Traveling before or after Santorini? *
       </h2>
-      <p className="mt-1 text-[10px] uppercase tracking-widest text-sage/70">*required</p>
       <div className="mt-4 flex flex-wrap gap-3">
         {OPTIONS.map(({ value, label }) => (
           <button
@@ -48,14 +48,23 @@ export default function TravelTimingModule({ draft, onAdvance }: TravelTimingMod
         value={local.travelNote}
         onChange={(event) => setLocal({ ...local, travelNote: event.target.value })}
       />
-      <button
-        type="button"
-        onClick={() => onAdvance(local)}
-        disabled={!canAdvanceFromTravelTiming(local)}
-        className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream disabled:opacity-40"
-      >
-        Next
-      </button>
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm font-semibold uppercase tracking-wide text-sage"
+        >
+          <span className="animate-arrow-bob">←</span> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => onAdvance(local)}
+          disabled={!canAdvanceFromTravelTiming(local)}
+          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
+        >
+          Next <span className="animate-arrow-bob">→</span>
+        </button>
+      </div>
     </ModulePanel>
   );
 }

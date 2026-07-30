@@ -40,7 +40,7 @@ export default function WeatherWidget() {
     <div className="fixed right-4 top-4 z-20 flex flex-col items-center text-cream">
       <SunGlyph className="h-7 w-7" />
       <span className="mt-1 text-sm font-bold">{Math.round(temperature)}°F</span>
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-sage">Santorini</span>
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-cream">Santorini</span>
     </div>
   );
 }

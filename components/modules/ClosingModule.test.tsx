@@ -11,9 +11,14 @@ describe('ClosingModule', () => {
 
   it('posts the draft with the note to /api/submit and shows a thank-you', async () => {
     const user = userEvent.setup();
-    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }} />);
+    render(
+      <ClosingModule
+        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
+        onBack={vi.fn()}
+      />
+    );
 
-    await user.type(screen.getByLabelText(/anything you want to share/i), 'Can\'t wait');
+    await user.type(screen.getByLabelText(/anything else you'd like to share/i), 'Can\'t wait');
     await user.click(screen.getByRole('button', { name: /^send$/i }));
 
     expect(global.fetch).toHaveBeenCalledWith(
@@ -24,18 +29,38 @@ describe('ClosingModule', () => {
   });
 
   it('shows the not-attending headline when attending is false', () => {
-    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }} />);
+    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }} onBack={vi.fn()} />);
     expect(screen.getByText(/sorry to miss you/i)).toBeInTheDocument();
   });
 
   it('shows the error state and re-enables Send when fetch rejects (network error)', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
     const user = userEvent.setup();
-    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }} />);
+    render(
+      <ClosingModule
+        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
+        onBack={vi.fn()}
+      />
+    );
 
     await user.click(screen.getByRole('button', { name: /^send$/i }));
 
     expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^send$/i })).not.toBeDisabled();
+  });
+
+  it('calls onBack when the Back button is clicked', async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(
+      <ClosingModule
+        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
+        onBack={onBack}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /back/i }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 });
