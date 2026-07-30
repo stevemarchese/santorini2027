@@ -1,48 +1,9 @@
-'use client';
-import { useState } from 'react';
-import Hero from '@/components/Hero';
-import AboutIcon from '@/components/AboutIcon';
-import WeatherWidget from '@/components/WeatherWidget';
-import LetterModule from '@/components/modules/LetterModule';
-import OpeningModule from '@/components/modules/OpeningModule';
-import HotelModule from '@/components/modules/HotelModule';
-import DateWindowsModule from '@/components/modules/DateWindowsModule';
-import TravelTimingModule from '@/components/modules/TravelTimingModule';
-import DinnerCruiseModule from '@/components/modules/DinnerCruiseModule';
-import ClosingModule from '@/components/modules/ClosingModule';
-import { getNextModule } from '@/lib/flow';
-import { EMPTY_DRAFT } from '@/lib/types';
-import type { DraftResponse, ModuleId } from '@/lib/types';
+import Wizard from '@/components/Wizard';
+import { getSiteContent } from '@/lib/site-content';
 
-export default function Home() {
-  const [moduleId, setModuleId] = useState<ModuleId>('letter');
-  const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
-  const [history, setHistory] = useState<ModuleId[]>([]);
+export const dynamic = 'force-dynamic';
 
-  function advance(updated: DraftResponse) {
-    setDraft(updated);
-    setHistory([...history, moduleId]);
-    setModuleId(getNextModule(moduleId, updated));
-  }
-
-  function goBack() {
-    if (history.length === 0) return;
-    setModuleId(history[history.length - 1]);
-    setHistory(history.slice(0, -1));
-  }
-
-  return (
-    <main>
-      <Hero />
-      <AboutIcon visible={moduleId !== 'letter'} />
-      <WeatherWidget />
-      {moduleId === 'letter' && <LetterModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'dinnerCruise' && <DinnerCruiseModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'closing' && <ClosingModule draft={draft} onBack={goBack} />}
-    </main>
-  );
+export default async function Home() {
+  const content = await getSiteContent();
+  return <Wizard content={content} />;
 }

@@ -3,19 +3,18 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LetterModule from './LetterModule';
 import { EMPTY_DRAFT } from '@/lib/types';
-import { LETTER_PARAGRAPHS } from '@/lib/letter-content';
 
 describe('LetterModule', () => {
-  it('renders the letter text and advances the unchanged draft on Next', async () => {
+  it('renders the provided paragraphs and advances the unchanged draft on Next', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
-    render(<LetterModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
+    const paragraphs = ['First paragraph.', 'Last paragraph.'];
+    render(<LetterModule draft={EMPTY_DRAFT} paragraphs={paragraphs} onAdvance={onAdvance} />);
 
-    expect(screen.getByText(LETTER_PARAGRAPHS[0])).toBeInTheDocument();
-    expect(screen.getByText(LETTER_PARAGRAPHS[LETTER_PARAGRAPHS.length - 1])).toBeInTheDocument();
+    expect(screen.getByText('First paragraph.')).toBeInTheDocument();
+    expect(screen.getByText('Last paragraph.')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /^next/i }));
-
     expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
   });
 });

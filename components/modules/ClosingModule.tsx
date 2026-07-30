@@ -6,9 +6,16 @@ import type { DraftResponse } from '@/lib/types';
 interface ClosingModuleProps {
   draft: DraftResponse;
   onBack: () => void;
+  confirmationAttending: string;
+  confirmationNotAttending: string;
 }
 
-export default function ClosingModule({ draft, onBack }: ClosingModuleProps) {
+export default function ClosingModule({
+  draft,
+  onBack,
+  confirmationAttending,
+  confirmationNotAttending,
+}: ClosingModuleProps) {
   const [note, setNote] = useState(draft.note);
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
@@ -30,7 +37,7 @@ export default function ClosingModule({ draft, onBack }: ClosingModuleProps) {
     return (
       <ModulePanel>
         <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
-          {draft.attending ? 'See you in Santorini' : 'Thanks for letting us know'}
+          {draft.attending ? confirmationAttending : confirmationNotAttending}
         </h2>
       </ModulePanel>
     );

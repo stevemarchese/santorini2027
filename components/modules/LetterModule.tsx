@@ -1,17 +1,17 @@
 'use client';
 import ModulePanel from '@/components/ModulePanel';
-import { LETTER_PARAGRAPHS } from '@/lib/letter-content';
 import type { DraftResponse } from '@/lib/types';
 
 interface LetterModuleProps {
   draft: DraftResponse;
+  paragraphs: string[];
   onAdvance: (updated: DraftResponse) => void;
 }
 
-export default function LetterModule({ draft, onAdvance }: LetterModuleProps) {
+export default function LetterModule({ draft, paragraphs, onAdvance }: LetterModuleProps) {
   return (
     <ModulePanel draggable>
-      {LETTER_PARAGRAPHS.map((paragraph, index) => (
+      {paragraphs.map((paragraph, index) => (
         <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
           {paragraph}
         </p>
