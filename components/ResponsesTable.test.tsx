@@ -248,5 +248,33 @@ describe('ResponsesTable', () => {
       // Alice's in-progress, unsaved edit must survive Charlie's late resolution.
       expect(screen.getByDisplayValue('Alicia')).toBeInTheDocument();
     });
+
+    it('saves normally on the first attempt after an earlier edit on any row was cancelled with Escape', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
+      render(<ResponsesTable responses={data} />);
+
+      // Cancel an edit with Escape. If a real blur never fires on unmount in
+      // this environment, cancelingEditRef can be left stuck true.
+      await user.click(screen.getByText('Charlie'));
+      const charlieInput = screen.getByDisplayValue('Charlie');
+      await user.clear(charlieInput);
+      await user.type(charlieInput, 'Something{Escape}');
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
+
+      // A stale cancelingEditRef from the Escape above must not swallow this
+      // unrelated save on the very next edit attempt.
+      await user.click(screen.getByText('Alice'));
+      const aliceInput = screen.getByDisplayValue('Alice');
+      await user.clear(aliceInput);
+      await user.type(aliceInput, 'Alicia{Enter}');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        `/api/admin/responses/${data[1].id}`,
+        expect.objectContaining({ method: 'PATCH' })
+      );
+      expect(await screen.findByText('Alicia')).toBeInTheDocument();
+    });
   });
 });

@@ -88,6 +88,11 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   function handleStartEdit(row: AdminResponse) {
     setActionError(null);
+    // Reset defensively: if a previous edit was cancelled with Escape and the
+    // resulting blur (see the input's onBlur below) was never actually fired
+    // by the browser, this flag could otherwise stay stuck true and silently
+    // swallow this new edit's save.
+    cancelingEditRef.current = false;
     editingIdRef.current = row.id;
     setEditingId(row.id);
     setEditingValue(row.name);
@@ -218,10 +223,13 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
                     value={editingValue}
                     onChange={(e) => setEditingValue(e.target.value)}
                     onBlur={() => {
-                      // Unmounting a focused input (Escape) fires a native blur
-                      // event — this flag lets the blur handler tell "cancel"
-                      // apart from "focus genuinely left" so a cancel never
-                      // also triggers a save.
+                      // Defensive guard, not a relied-upon mechanism: some
+                      // browsers may fire a native blur when a focused input
+                      // is unmounted (as Escape does below), which would
+                      // otherwise re-trigger a save. If that blur never
+                      // arrives, handleStartEdit resets this flag at the
+                      // start of the next edit so it can never go stale and
+                      // swallow an unrelated future save.
                       if (cancelingEditRef.current) {
                         cancelingEditRef.current = false;
                         return;
