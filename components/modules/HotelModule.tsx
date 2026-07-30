@@ -47,7 +47,7 @@ export default function HotelModule({ draft, onAdvance }: HotelModuleProps) {
             id="hotelNights"
             type="number"
             min={1}
-            className="mt-1 w-full border-b border-cream/35 bg-transparent text-cream"
+            className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
             value={local.hotelNights ?? ''}
             onChange={(event) =>
               setLocal({ ...local, hotelNights: event.target.value ? Number(event.target.value) : null })

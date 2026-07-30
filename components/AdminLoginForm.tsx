@@ -31,7 +31,7 @@ export default function AdminLoginForm() {
       <input
         id="adminPassword"
         type="password"
-        className="mt-1 w-full border-b border-cream/35 bg-transparent text-cream"
+        className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
       />

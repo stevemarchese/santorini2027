@@ -45,7 +45,7 @@ export default function ClosingModule({ draft }: ClosingModuleProps) {
       </label>
       <textarea
         id="note"
-        className="mt-1 w-full border-b border-cream/35 bg-transparent text-cream"
+        className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
         value={note}
         onChange={(event) => setNote(event.target.value)}
       />

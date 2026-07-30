@@ -35,7 +35,7 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
       </label>
       <input
         id="name"
-        className="mt-1 w-full border-b border-cream/35 bg-transparent text-cream"
+        className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
         value={local.name}
         onChange={(event) => setLocal({ ...local, name: event.target.value })}
       />
