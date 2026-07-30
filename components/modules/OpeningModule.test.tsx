@@ -24,4 +24,12 @@ describe('OpeningModule', () => {
     render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
     expect(screen.getByRole('button', { name: /^next$/i })).toBeDisabled();
   });
+
+  it('renders the unselected attending buttons as legible cream pills', () => {
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    const imInButton = screen.getByRole('button', { name: /i'm in/i });
+    expect(imInButton.className).toContain('rounded-full');
+    expect(imInButton.className).toContain('bg-cream');
+    expect(imInButton.className).toContain('text-navy');
+  });
 });

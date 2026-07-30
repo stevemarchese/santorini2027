@@ -34,8 +34,8 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
         <button
           type="button"
           onClick={() => setLocal({ ...local, attending: true })}
-          className={`px-5 py-2 text-xs font-bold uppercase tracking-wide ${
-            local.attending === true ? 'bg-terracotta text-cream' : 'border border-teal text-teal'
+          className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wide ${
+            local.attending === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
           I&apos;m in
@@ -43,8 +43,8 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
         <button
           type="button"
           onClick={() => setLocal({ ...local, attending: false, partySize: null })}
-          className={`px-5 py-2 text-xs font-bold uppercase tracking-wide ${
-            local.attending === false ? 'bg-terracotta text-cream' : 'border border-teal text-teal'
+          className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wide ${
+            local.attending === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
           }`}
         >
           Can&apos;t make it
