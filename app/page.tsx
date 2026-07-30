@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Hero from '@/components/Hero';
+import LetterModule from '@/components/modules/LetterModule';
 import OpeningModule from '@/components/modules/OpeningModule';
 import HotelModule from '@/components/modules/HotelModule';
 import DateWindowsModule from '@/components/modules/DateWindowsModule';
@@ -12,7 +13,7 @@ import { EMPTY_DRAFT } from '@/lib/types';
 import type { DraftResponse, ModuleId } from '@/lib/types';
 
 export default function Home() {
-  const [moduleId, setModuleId] = useState<ModuleId>('opening');
+  const [moduleId, setModuleId] = useState<ModuleId>('letter');
   const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
 
   function advance(updated: DraftResponse) {
@@ -23,6 +24,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      {moduleId === 'letter' && <LetterModule draft={draft} onAdvance={advance} />}
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
       {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
       {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} />}
