@@ -32,19 +32,20 @@ export default function AboutIcon({ visible }: AboutIconProps) {
       </button>
       {open && (
         <div className="fixed inset-0 z-30 flex items-center justify-center p-6">
-          <div className="animate-module-in blob-panel max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
+          <div className="animate-module-in blob-panel relative max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 text-xl leading-none text-cream/70 hover:text-cream"
+            >
+              ×
+            </button>
             {LETTER_PARAGRAPHS.map((paragraph, index) => (
               <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
                 {paragraph}
               </p>
             ))}
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="mt-6 bg-terracotta px-5 py-2 text-xs font-bold uppercase tracking-wide text-cream"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
