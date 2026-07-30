@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://santorini2027.com'),
   title: 'Santorini 2027',
   description: 'Join us in Santorini — July 2027',
 };
