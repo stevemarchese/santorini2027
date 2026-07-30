@@ -191,5 +191,62 @@ describe('ResponsesTable', () => {
       expect(await screen.findByText(/couldn.t save/i)).toBeInTheDocument();
       expect(screen.getByDisplayValue('Charlotte')).toBeInTheDocument();
     });
+
+    it('saves a second edit on a different row after an earlier save already completed', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
+      render(<ResponsesTable responses={data} />);
+
+      await user.click(screen.getByText('Charlie'));
+      const charlieInput = screen.getByDisplayValue('Charlie');
+      await user.clear(charlieInput);
+      await user.type(charlieInput, 'Charlotte{Enter}');
+      expect(await screen.findByText('Charlotte')).toBeInTheDocument();
+
+      // A stale cancelingEditRef left set from the first save must not
+      // silently swallow this second, unrelated save.
+      await user.click(screen.getByText('Alice'));
+      const aliceInput = screen.getByDisplayValue('Alice');
+      await user.clear(aliceInput);
+      await user.type(aliceInput, 'Alicia{Enter}');
+
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+      expect(global.fetch).toHaveBeenNthCalledWith(
+        2,
+        `/api/admin/responses/${data[1].id}`,
+        expect.objectContaining({ method: 'PATCH' })
+      );
+      expect(await screen.findByText('Alicia')).toBeInTheDocument();
+    });
+
+    it('does not clobber an in-progress edit on a different row when an earlier save resolves late', async () => {
+      const user = userEvent.setup();
+      let resolveFetch: (value: { ok: boolean }) => void = () => {};
+      const pending = new Promise<{ ok: boolean }>((resolve) => {
+        resolveFetch = resolve;
+      });
+      vi.stubGlobal('fetch', vi.fn().mockReturnValue(pending));
+      render(<ResponsesTable responses={data} />);
+
+      // Start saving Charlie, but the fetch never resolves yet.
+      await user.click(screen.getByText('Charlie'));
+      const charlieInput = screen.getByDisplayValue('Charlie');
+      await user.clear(charlieInput);
+      await user.type(charlieInput, 'Charlotte{Enter}');
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Before that save resolves, start editing a different row.
+      await user.click(screen.getByText('Alice'));
+      const aliceInput = screen.getByDisplayValue('Alice');
+      await user.clear(aliceInput);
+      await user.type(aliceInput, 'Alicia');
+
+      // Now let Charlie's stale save resolve.
+      resolveFetch({ ok: true });
+      await screen.findByText('Charlotte');
+
+      // Alice's in-progress, unsaved edit must survive Charlie's late resolution.
+      expect(screen.getByDisplayValue('Alicia')).toBeInTheDocument();
+    });
   });
 });

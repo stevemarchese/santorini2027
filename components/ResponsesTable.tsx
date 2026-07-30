@@ -38,6 +38,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const cancelingEditRef = useRef(false);
+  const editingIdRef = useRef<string | null>(null);
 
   const sorted = sortResponses(items, sortKey, sortDir);
   const stats = computeResponsesStats(items);
@@ -87,15 +88,13 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   function handleStartEdit(row: AdminResponse) {
     setActionError(null);
+    editingIdRef.current = row.id;
     setEditingId(row.id);
     setEditingValue(row.name);
   }
 
   function handleCancelEdit() {
-    // Unmounting a focused input fires a native blur event — this flag lets
-    // the blur handler tell "cancel" apart from "focus genuinely left" so a
-    // cancel never also triggers a save.
-    cancelingEditRef.current = true;
+    editingIdRef.current = null;
     setEditingId(null);
     setEditingValue('');
   }
@@ -119,7 +118,9 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
       });
       if (res.ok) {
         setItems((current) => current.map((r) => (r.id === row.id ? { ...r, name: trimmed } : r)));
-        handleCancelEdit();
+        if (editingIdRef.current === row.id) {
+          handleCancelEdit();
+        }
       } else {
         setActionError(`Couldn't save ${row.name}'s name — try again.`);
       }
@@ -217,6 +218,10 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
                     value={editingValue}
                     onChange={(e) => setEditingValue(e.target.value)}
                     onBlur={() => {
+                      // Unmounting a focused input (Escape) fires a native blur
+                      // event — this flag lets the blur handler tell "cancel"
+                      // apart from "focus genuinely left" so a cancel never
+                      // also triggers a save.
                       if (cancelingEditRef.current) {
                         cancelingEditRef.current = false;
                         return;
@@ -227,6 +232,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
                       if (e.key === 'Enter') {
                         e.currentTarget.blur();
                       } else if (e.key === 'Escape') {
+                        cancelingEditRef.current = true;
                         handleCancelEdit();
                       }
                     }}
