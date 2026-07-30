@@ -84,3 +84,36 @@ describe('deleteResponse', () => {
     expect(result).toEqual({ error: 'boom' });
   });
 });
+
+describe('updateResponseName', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    process.env.SUPABASE_URL = 'https://example.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+  });
+
+  it('updates the name by id and returns no error on success', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: null });
+    const update = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ update });
+
+    const { updateResponseName } = await import('./supabase-admin');
+    const result = await updateResponseName('abc-123', 'New Name');
+
+    expect(fromMock).toHaveBeenCalledWith('responses');
+    expect(update).toHaveBeenCalledWith({ name: 'New Name' });
+    expect(eq).toHaveBeenCalledWith('id', 'abc-123');
+    expect(result).toEqual({ error: null });
+  });
+
+  it('returns the error message on failure', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: { message: 'boom' } });
+    const update = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ update });
+
+    const { updateResponseName } = await import('./supabase-admin');
+    const result = await updateResponseName('abc-123', 'New Name');
+
+    expect(result).toEqual({ error: 'boom' });
+  });
+});

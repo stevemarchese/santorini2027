@@ -27,3 +27,9 @@ export async function deleteResponse(id: string): Promise<{ error: string | null
   const { error } = await supabase.from('responses').delete().eq('id', id);
   return { error: error?.message ?? null };
 }
+
+export async function updateResponseName(id: string, name: string): Promise<{ error: string | null }> {
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from('responses').update({ name }).eq('id', id);
+  return { error: error?.message ?? null };
+}
