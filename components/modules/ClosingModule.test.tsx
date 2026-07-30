@@ -4,17 +4,23 @@ import userEvent from '@testing-library/user-event';
 import ClosingModule from './ClosingModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
+const CONFIRMATIONS = {
+  confirmationAttending: 'See you in Santorini',
+  confirmationNotAttending: 'Thanks for letting us know',
+};
+
 describe('ClosingModule', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
   });
 
-  it('posts the draft with the note to /api/submit and shows a thank-you', async () => {
+  it('posts the draft with the note to /api/submit and shows the attending confirmation', async () => {
     const user = userEvent.setup();
     render(
       <ClosingModule
         draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
         onBack={vi.fn()}
+        {...CONFIRMATIONS}
       />
     );
 
@@ -28,9 +34,28 @@ describe('ClosingModule', () => {
     expect(await screen.findByText(/see you in santorini/i)).toBeInTheDocument();
   });
 
-  it('shows the not-attending headline when attending is false', () => {
-    render(<ClosingModule draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }} onBack={vi.fn()} />);
+  it('shows the not-attending pre-submit headline when attending is false', () => {
+    render(
+      <ClosingModule
+        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }}
+        onBack={vi.fn()}
+        {...CONFIRMATIONS}
+      />
+    );
     expect(screen.getByText(/sorry to miss you/i)).toBeInTheDocument();
+  });
+
+  it('shows the not-attending confirmation after sending', async () => {
+    const user = userEvent.setup();
+    render(
+      <ClosingModule
+        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }}
+        onBack={vi.fn()}
+        {...CONFIRMATIONS}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /^send$/i }));
+    expect(await screen.findByText(/thanks for letting us know/i)).toBeInTheDocument();
   });
 
   it('shows the error state and re-enables Send when fetch rejects (network error)', async () => {
@@ -40,6 +65,7 @@ describe('ClosingModule', () => {
       <ClosingModule
         draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
         onBack={vi.fn()}
+        {...CONFIRMATIONS}
       />
     );
 
@@ -56,11 +82,11 @@ describe('ClosingModule', () => {
       <ClosingModule
         draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 }}
         onBack={onBack}
+        {...CONFIRMATIONS}
       />
     );
 
     await user.click(screen.getByRole('button', { name: /back/i }));
-
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

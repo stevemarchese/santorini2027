@@ -17,6 +17,8 @@ export interface ResponseRow {
   note: string | null;
 }
 
+export type AdminResponse = ResponseRow & { id: string; created_at: string };
+
 function asTrimmedString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }

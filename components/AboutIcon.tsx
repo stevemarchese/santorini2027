@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { LETTER_PARAGRAPHS } from '@/lib/letter-content';
 
 function LetterGlyph({ className }: { className?: string }) {
   return (
@@ -12,9 +11,10 @@ function LetterGlyph({ className }: { className?: string }) {
 
 interface AboutIconProps {
   visible: boolean;
+  paragraphs: string[];
 }
 
-export default function AboutIcon({ visible }: AboutIconProps) {
+export default function AboutIcon({ visible, paragraphs }: AboutIconProps) {
   const [open, setOpen] = useState(false);
 
   if (!visible) return null;
@@ -41,7 +41,7 @@ export default function AboutIcon({ visible }: AboutIconProps) {
             >
               ×
             </button>
-            {LETTER_PARAGRAPHS.map((paragraph, index) => (
+            {paragraphs.map((paragraph, index) => (
               <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
                 {paragraph}
               </p>
