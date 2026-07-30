@@ -38,6 +38,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   const sorted = sortResponses(items, sortKey, sortDir);
   const stats = computeResponsesStats(items);
+  const windowMaxCount = Math.max(...WINDOW_KEYS.map((key) => stats.windowPriorityCounts[key]));
 
   function handleSort(key: SortKey) {
     setDeleteError(null);
@@ -83,24 +84,42 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-sage">
-        <span>
-          Attending: {stats.totalGuests} guests ({stats.totalAttending}/{stats.totalResponses} responses)
-        </span>
-        <span>Avg hotel stay: {stats.avgHotelNights == null ? '—' : `${stats.avgHotelNights} nights`}</span>
-        <span>
-          Window priority:{' '}
-          {WINDOW_KEYS.map((key, i) => (
-            <span key={key}>
-              {i > 0 ? ' · ' : ''}
-              <span className={stats.topPriorityWindow === key ? 'font-bold text-cream' : undefined}>
-                {WINDOW_LABELS[key]} {stats.windowPriorityCounts[key]}
-              </span>
-            </span>
+      <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div data-testid="stat-attending" className="rounded-md border border-cream/25 p-3">
+          <div className="text-xs uppercase tracking-wide text-sage">Attending</div>
+          <div className="text-2xl font-bold text-cream">{stats.totalGuests} guests</div>
+          <div className="text-xs text-sage">
+            {stats.totalAttending}/{stats.totalResponses} responses
+          </div>
+        </div>
+        <div data-testid="stat-hotel" className="rounded-md border border-cream/25 p-3">
+          <div className="text-xs uppercase tracking-wide text-sage">Avg Hotel Stay</div>
+          <div className="text-2xl font-bold text-cream">
+            {stats.avgHotelNights == null ? '—' : `${stats.avgHotelNights} nights`}
+          </div>
+        </div>
+        <div data-testid="stat-dinner-cruise" className="rounded-md border border-cream/25 p-3">
+          <div className="text-xs uppercase tracking-wide text-sage">Dinner / Cruise</div>
+          <div className="text-lg font-bold text-cream">
+            {stats.dinnerGuestCount} dinner · {stats.cruiseGuestCount} cruise
+          </div>
+        </div>
+        <div data-testid="stat-window-priority" className="rounded-md border border-cream/25 p-3 md:col-span-3">
+          <div className="mb-2 text-xs uppercase tracking-wide text-sage">Window Priority</div>
+          {WINDOW_KEYS.map((key) => (
+            <div key={key} className="mb-1 flex items-center gap-2 text-xs text-cream last:mb-0">
+              <span className="w-20 shrink-0">{WINDOW_LABELS[key]}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded bg-cream/10">
+                <div
+                  data-bar-key={key}
+                  className={stats.topPriorityWindow === key ? 'h-full bg-terracotta' : 'h-full bg-cream/30'}
+                  style={{ width: `${(stats.windowPriorityCounts[key] / Math.max(1, windowMaxCount)) * 100}%` }}
+                />
+              </div>
+              <span className="w-4 shrink-0 text-right">{stats.windowPriorityCounts[key]}</span>
+            </div>
           ))}
-        </span>
-        <span>Dinner: {stats.dinnerGuestCount} guests interested</span>
-        <span>Cruise: {stats.cruiseGuestCount} guests interested</span>
+        </div>
       </div>
 
       <div className="mb-4 flex items-center justify-between">

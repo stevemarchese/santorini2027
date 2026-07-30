@@ -48,39 +48,42 @@ describe('ResponsesTable', () => {
     expect(screen.getByRole('button', { name: /download csv/i })).toBeInTheDocument();
   });
 
-  it('renders the summary stats bar', () => {
+  it('renders the summary stats cards with headcount and hotel/dinner/cruise numbers', () => {
     const statsData = [
       row({ name: 'A', attending: true, party_size: 4, dinner_interested: true, cruise_interested: true }),
       row({ name: 'B', attending: false, party_size: 2 }),
       row({ name: 'C', attending: true, party_size: 2, dinner_interested: true, cruise_interested: false }),
     ];
     render(<ResponsesTable responses={statsData} />);
-    expect(screen.getByText(/attending: 6 guests \(2\/3 responses\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/dinner: 6 guests interested/i)).toBeInTheDocument();
-    expect(screen.getByText(/cruise: 4 guests interested/i)).toBeInTheDocument();
+    const attendingCard = screen.getByTestId('stat-attending');
+    expect(within(attendingCard).getByText(/6 guests/i)).toBeInTheDocument();
+    expect(within(attendingCard).getByText(/2\/3 responses/i)).toBeInTheDocument();
+    expect(screen.getByTestId('stat-dinner-cruise')).toHaveTextContent('6 dinner · 4 cruise');
   });
 
-  it('renders the window priority breakdown with per-window counts and bolds the top window', () => {
+  it('renders the window priority breakdown as bars with per-window counts and highlights the top window', () => {
     const windowData = [
       row({ name: 'A', window_priority: 'window_2' }),
       row({ name: 'B', window_priority: 'window_1' }),
       row({ name: 'C', window_priority: 'window_2' }),
     ];
     render(<ResponsesTable responses={windowData} />);
-    const priorityLine = screen.getByText(/window priority:/i).closest('span') as HTMLElement;
-    expect(within(priorityLine).getByText(/6\/30-7\/6 1/)).toBeInTheDocument();
-    expect(within(priorityLine).getByText(/7\/7-7\/13 2/)).toBeInTheDocument();
-    expect(within(priorityLine).getByText(/7\/14-7\/18 0/)).toBeInTheDocument();
-    const topWindow = within(priorityLine).getByText(/7\/7-7\/13 2/);
-    expect(topWindow.className).toContain('font-bold');
-    const nonTopWindow = within(priorityLine).getByText(/6\/30-7\/6 1/);
-    expect(nonTopWindow.className).not.toContain('font-bold');
+    const priorityCard = screen.getByTestId('stat-window-priority');
+    expect(within(priorityCard).getByText('6/30-7/6')).toBeInTheDocument();
+    expect(within(priorityCard).getByText('7/7-7/13')).toBeInTheDocument();
+    expect(within(priorityCard).getByText('7/14-7/18')).toBeInTheDocument();
+    expect(within(priorityCard).getByText('1')).toBeInTheDocument();
+    expect(within(priorityCard).getByText('2')).toBeInTheDocument();
+    const topBar = priorityCard.querySelector('[data-bar-key="window_2"]');
+    const nonTopBar = priorityCard.querySelector('[data-bar-key="window_1"]');
+    expect(topBar?.className).toContain('bg-terracotta');
+    expect(nonTopBar?.className).not.toContain('bg-terracotta');
   });
 
   it('shows a dash for the average hotel stay when nobody is staying at the hotel', () => {
     const noHotelData = [row({ name: 'A', hotel_staying: false }), row({ name: 'B', hotel_staying: null })];
     render(<ResponsesTable responses={noHotelData} />);
-    expect(screen.getByText(/avg hotel stay: —/i)).toBeInTheDocument();
+    expect(within(screen.getByTestId('stat-hotel')).getByText('—')).toBeInTheDocument();
   });
 
   describe('delete', () => {
