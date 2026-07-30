@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { AdminResponse } from '@/lib/payload';
 import { sortResponses, type SortKey, type SortDirection } from '@/lib/responses-sort';
 import { buildResponsesCsv } from '@/lib/responses-export';
@@ -34,14 +34,17 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
   const [sortDir, setSortDir] = useState<SortDirection>('desc');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+  const cancelingEditRef = useRef(false);
 
   const sorted = sortResponses(items, sortKey, sortDir);
   const stats = computeResponsesStats(items);
   const windowMaxCount = Math.max(...WINDOW_KEYS.map((key) => stats.windowPriorityCounts[key]));
 
   function handleSort(key: SortKey) {
-    setDeleteError(null);
+    setActionError(null);
     if (key === sortKey) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -51,7 +54,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   }
 
   function handleDownload() {
-    setDeleteError(null);
+    setActionError(null);
     const csv = buildResponsesCsv(items);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -66,19 +69,62 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   async function handleDelete(row: AdminResponse) {
     if (!window.confirm(`Delete ${row.name}'s response? This can't be undone.`)) return;
-    setDeleteError(null);
+    setActionError(null);
     setDeletingId(row.id);
     try {
       const res = await fetch(`/api/admin/responses/${row.id}`, { method: 'DELETE' });
       if (res.ok) {
         setItems((current) => current.filter((r) => r.id !== row.id));
       } else {
-        setDeleteError(`Couldn't delete ${row.name}'s response — try again.`);
+        setActionError(`Couldn't delete ${row.name}'s response — try again.`);
       }
     } catch {
-      setDeleteError(`Couldn't delete ${row.name}'s response — try again.`);
+      setActionError(`Couldn't delete ${row.name}'s response — try again.`);
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  function handleStartEdit(row: AdminResponse) {
+    setActionError(null);
+    setEditingId(row.id);
+    setEditingValue(row.name);
+  }
+
+  function handleCancelEdit() {
+    // Unmounting a focused input fires a native blur event — this flag lets
+    // the blur handler tell "cancel" apart from "focus genuinely left" so a
+    // cancel never also triggers a save.
+    cancelingEditRef.current = true;
+    setEditingId(null);
+    setEditingValue('');
+  }
+
+  async function handleSaveEdit(row: AdminResponse) {
+    const trimmed = editingValue.trim();
+    if (!trimmed) {
+      setActionError('Name is required');
+      return;
+    }
+    if (trimmed === row.name) {
+      handleCancelEdit();
+      return;
+    }
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/responses/${row.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (res.ok) {
+        setItems((current) => current.map((r) => (r.id === row.id ? { ...r, name: trimmed } : r)));
+        handleCancelEdit();
+      } else {
+        setActionError(`Couldn't save ${row.name}'s name — try again.`);
+      }
+    } catch {
+      setActionError(`Couldn't save ${row.name}'s name — try again.`);
     }
   }
 
@@ -135,7 +181,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
         </button>
       </div>
 
-      {deleteError && <p className="mb-2 text-sm text-terracotta">{deleteError}</p>}
+      {actionError && <p className="mb-2 text-sm text-terracotta">{actionError}</p>}
 
       <table className="w-full border-collapse text-sm text-cream">
         <thead>
@@ -164,7 +210,39 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
           {sorted.map((row) => (
             <tr key={row.id} className="border-b border-cream/10">
               <td className="p-2">{new Date(row.created_at).toLocaleDateString()}</td>
-              <td className="p-2">{row.name}</td>
+              <td className="p-2">
+                {editingId === row.id ? (
+                  <input
+                    autoFocus
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                    onBlur={() => {
+                      if (cancelingEditRef.current) {
+                        cancelingEditRef.current = false;
+                        return;
+                      }
+                      handleSaveEdit(row);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.currentTarget.blur();
+                      } else if (e.key === 'Escape') {
+                        handleCancelEdit();
+                      }
+                    }}
+                    className="w-full border-b border-cream/35 bg-transparent text-cream outline-none"
+                  />
+                ) : (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleStartEdit(row)}
+                    className="cursor-pointer hover:underline"
+                  >
+                    {row.name}
+                  </span>
+                )}
+              </td>
               <td className="p-2">{row.attending ? 'Yes' : 'No'}</td>
               <td className="p-2">{row.party_size ?? '—'}</td>
               <td className="p-2">

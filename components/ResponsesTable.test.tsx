@@ -128,4 +128,68 @@ describe('ResponsesTable', () => {
       expect(screen.getByText('Charlie')).toBeInTheDocument();
     });
   });
+
+  describe('edit name', () => {
+    it('shows an input pre-filled with the current name when clicked', async () => {
+      const user = userEvent.setup();
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getByText('Charlie'));
+      expect(screen.getByDisplayValue('Charlie')).toBeInTheDocument();
+    });
+
+    it('saves the new name on Enter and updates the row', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getByText('Charlie'));
+      const input = screen.getByDisplayValue('Charlie');
+      await user.clear(input);
+      await user.type(input, 'Charlotte{Enter}');
+      expect(global.fetch).toHaveBeenCalledWith(
+        `/api/admin/responses/${data[0].id}`,
+        expect.objectContaining({ method: 'PATCH' })
+      );
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1];
+      expect(JSON.parse(call.body).name).toBe('Charlotte');
+      expect(await screen.findByText('Charlotte')).toBeInTheDocument();
+      expect(screen.queryByDisplayValue('Charlotte')).not.toBeInTheDocument();
+    });
+
+    it('cancels on Escape without saving', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn());
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getByText('Charlie'));
+      const input = screen.getByDisplayValue('Charlie');
+      await user.clear(input);
+      await user.type(input, 'Charlotte{Escape}');
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
+    });
+
+    it('shows an error and keeps editing when the name is empty', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn());
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getByText('Charlie'));
+      const input = screen.getByDisplayValue('Charlie');
+      await user.clear(input);
+      await user.type(input, '   {Enter}');
+      expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(screen.getByDisplayValue('   ', { normalizer: (text) => text })).toBeInTheDocument();
+    });
+
+    it('shows an inline error and keeps editing when the save fails', async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getByText('Charlie'));
+      const input = screen.getByDisplayValue('Charlie');
+      await user.clear(input);
+      await user.type(input, 'Charlotte{Enter}');
+      expect(await screen.findByText(/couldn.t save/i)).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Charlotte')).toBeInTheDocument();
+    });
+  });
 });
