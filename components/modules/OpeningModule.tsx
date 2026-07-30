@@ -22,7 +22,7 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
   const [local, setLocal] = useState(draft);
 
   return (
-    <ModulePanel>
+    <ModulePanel draggable>
       <p className="text-xs font-bold uppercase tracking-widest text-cream/70">
         20 years — July 4, 2007
       </p>

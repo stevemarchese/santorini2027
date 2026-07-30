@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ModulePanel from './ModulePanel';
 
 describe('ModulePanel', () => {
@@ -10,5 +10,29 @@ describe('ModulePanel', () => {
       </ModulePanel>
     );
     expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+
+  it('does not move when draggable is false, even if pointer events fire', () => {
+    const { container } = render(
+      <ModulePanel>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    fireEvent.pointerDown(panel, { clientX: 0, clientY: 0, pointerId: 1 });
+    fireEvent.pointerMove(panel, { clientX: 50, clientY: 50, pointerId: 1 });
+    expect(panel.style.transform).toBe('');
+  });
+
+  it('moves within bounds when draggable is true', () => {
+    const { container } = render(
+      <ModulePanel draggable>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    fireEvent.pointerDown(panel, { clientX: 0, clientY: 0, pointerId: 1 });
+    fireEvent.pointerMove(panel, { clientX: 40, clientY: 20, pointerId: 1 });
+    expect(panel.style.transform).toBe('translate(40px, 20px)');
   });
 });
