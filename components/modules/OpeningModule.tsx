@@ -62,7 +62,7 @@ export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) 
       </div>
       {local.attending === true && (
         <>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Party size</p>
+          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Party size *</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
               <button

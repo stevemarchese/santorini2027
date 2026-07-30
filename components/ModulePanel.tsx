@@ -10,18 +10,23 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+const INTERACTIVE_SELECTOR = 'input, button, textarea, select, a, label';
+
 export default function ModulePanel({ children, draggable = false }: ModulePanelProps) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!draggable) return;
+    if ((event.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
     dragState.current = {
       startX: event.clientX,
       startY: event.clientY,
       originX: offset.x,
       originY: offset.y,
     };
+    setIsDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   }
 
@@ -39,6 +44,7 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
 
   function handlePointerUp() {
     dragState.current = null;
+    setIsDragging(false);
   }
 
   return (
@@ -47,9 +53,14 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         style={
           draggable
-            ? { transform: `translate(${offset.x}px, ${offset.y}px)`, cursor: 'grab', touchAction: 'none' }
+            ? {
+                transform: `translate(${offset.x}px, ${offset.y}px)`,
+                cursor: isDragging ? 'grabbing' : 'grab',
+                touchAction: isDragging ? 'none' : undefined,
+              }
             : undefined
         }
         className="animate-module-in max-h-dvh w-full max-w-md overflow-y-auto border-l-4 border-terracotta bg-navy/[0.82] p-8 backdrop-blur-md"

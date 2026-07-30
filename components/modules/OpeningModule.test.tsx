@@ -53,4 +53,11 @@ describe('OpeningModule', () => {
     expect(screen.getByText('Your name *')).toBeInTheDocument();
     expect(screen.getByText('Are you coming? *')).toBeInTheDocument();
   });
+
+  it('shows an asterisk on Party size once attending is true', async () => {
+    const user = userEvent.setup();
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: /i'm in/i }));
+    expect(screen.getByText('Party size *')).toBeInTheDocument();
+  });
 });

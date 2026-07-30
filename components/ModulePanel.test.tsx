@@ -49,4 +49,20 @@ describe('ModulePanel', () => {
     fireEvent.pointerMove(panel, { clientX: 2000, clientY: 2000, pointerId: 1 });
     expect(panel.style.transform).toBe('translate(432px, 304px)');
   });
+
+  it('does not start a drag when pointerdown originates on an interactive child', () => {
+    render(
+      <ModulePanel draggable>
+        <button type="button">Click me</button>
+      </ModulePanel>
+    );
+    const panel = document.querySelector('.animate-module-in') as HTMLElement;
+    const button = screen.getByRole('button', { name: 'Click me' });
+    fireEvent.pointerDown(button, { clientX: 0, clientY: 0, pointerId: 1 });
+    fireEvent.pointerMove(panel, { clientX: 50, clientY: 50, pointerId: 1 });
+    // draggable=true always renders a transform from offset state, so the untouched
+    // baseline is 'translate(0px, 0px)' rather than ''. What matters is that the
+    // 50,50 pointermove had no effect, proving the guard clause blocked the drag.
+    expect(panel.style.transform).toBe('translate(0px, 0px)');
+  });
 });
