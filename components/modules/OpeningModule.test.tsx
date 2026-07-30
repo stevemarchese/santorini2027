@@ -12,7 +12,7 @@ describe('OpeningModule', () => {
 
     await user.type(screen.getByLabelText(/your name/i), 'Steve');
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
-    await user.type(screen.getByLabelText(/party size/i), '2');
+    await user.click(screen.getByRole('button', { name: '+1' }));
     await user.click(screen.getByRole('button', { name: /^next$/i }));
 
     expect(onAdvance).toHaveBeenCalledWith(
@@ -31,5 +31,19 @@ describe('OpeningModule', () => {
     expect(imInButton.className).toContain('rounded-full');
     expect(imInButton.className).toContain('bg-cream');
     expect(imInButton.className).toContain('text-navy');
+  });
+
+  it('offers six party-size pills mapping to 1 through 6', async () => {
+    const user = userEvent.setup();
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /i'm in/i }));
+
+    expect(screen.getByRole('button', { name: 'Just me' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+2' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+3' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+4' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+5' })).toBeInTheDocument();
   });
 });
