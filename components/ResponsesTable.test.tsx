@@ -50,13 +50,37 @@ describe('ResponsesTable', () => {
 
   it('renders the summary stats bar', () => {
     const statsData = [
-      row({ name: 'A', attending: true, dinner_interested: true, cruise_interested: true }),
-      row({ name: 'B', attending: false }),
+      row({ name: 'A', attending: true, party_size: 4, dinner_interested: true, cruise_interested: true }),
+      row({ name: 'B', attending: false, party_size: 2 }),
+      row({ name: 'C', attending: true, party_size: 2, dinner_interested: true, cruise_interested: false }),
     ];
     render(<ResponsesTable responses={statsData} />);
-    expect(screen.getByText(/attending: 1 \/ 2/i)).toBeInTheDocument();
-    expect(screen.getByText(/dinner: 1 yes/i)).toBeInTheDocument();
-    expect(screen.getByText(/cruise: 1 yes/i)).toBeInTheDocument();
+    expect(screen.getByText(/attending: 6 guests \(2\/3 responses\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/dinner: 6 guests interested/i)).toBeInTheDocument();
+    expect(screen.getByText(/cruise: 4 guests interested/i)).toBeInTheDocument();
+  });
+
+  it('renders the window priority breakdown with per-window counts and bolds the top window', () => {
+    const windowData = [
+      row({ name: 'A', window_priority: 'window_2' }),
+      row({ name: 'B', window_priority: 'window_1' }),
+      row({ name: 'C', window_priority: 'window_2' }),
+    ];
+    render(<ResponsesTable responses={windowData} />);
+    const priorityLine = screen.getByText(/window priority:/i).closest('span') as HTMLElement;
+    expect(within(priorityLine).getByText(/6\/30-7\/6 1/)).toBeInTheDocument();
+    expect(within(priorityLine).getByText(/7\/7-7\/13 2/)).toBeInTheDocument();
+    expect(within(priorityLine).getByText(/7\/14-7\/18 0/)).toBeInTheDocument();
+    const topWindow = within(priorityLine).getByText(/7\/7-7\/13 2/);
+    expect(topWindow.className).toContain('font-bold');
+    const nonTopWindow = within(priorityLine).getByText(/6\/30-7\/6 1/);
+    expect(nonTopWindow.className).not.toContain('font-bold');
+  });
+
+  it('shows a dash for the average hotel stay when nobody is staying at the hotel', () => {
+    const noHotelData = [row({ name: 'A', hotel_staying: false }), row({ name: 'B', hotel_staying: null })];
+    render(<ResponsesTable responses={noHotelData} />);
+    expect(screen.getByText(/avg hotel stay: —/i)).toBeInTheDocument();
   });
 
   describe('delete', () => {
@@ -67,7 +91,7 @@ describe('ResponsesTable', () => {
       render(<ResponsesTable responses={data} />);
       await user.click(screen.getAllByRole('button', { name: /^delete$/i })[0]);
       expect(global.fetch).toHaveBeenCalledWith(`/api/admin/responses/${data[0].id}`, { method: 'DELETE' });
-      expect(await screen.findByText(/2 responses/i)).toBeInTheDocument();
+      expect(await screen.findByText(/^2 responses$/i)).toBeInTheDocument();
       expect(screen.queryByText('Charlie')).not.toBeInTheDocument();
     });
 
@@ -85,6 +109,16 @@ describe('ResponsesTable', () => {
       const user = userEvent.setup();
       vi.spyOn(window, 'confirm').mockReturnValue(true);
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      render(<ResponsesTable responses={data} />);
+      await user.click(screen.getAllByRole('button', { name: /^delete$/i })[0]);
+      expect(await screen.findByText(/couldn.t delete/i)).toBeInTheDocument();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
+    });
+
+    it('shows an inline error and keeps the row when the fetch promise rejects', async () => {
+      const user = userEvent.setup();
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network')));
       render(<ResponsesTable responses={data} />);
       await user.click(screen.getAllByRole('button', { name: /^delete$/i })[0]);
       expect(await screen.findByText(/couldn.t delete/i)).toBeInTheDocument();

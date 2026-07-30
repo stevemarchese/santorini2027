@@ -10,7 +10,7 @@ interface ResponsesTableProps {
   responses: AdminResponse[];
 }
 
-const COLUMNS: { key: SortKey | null; label: string }[] = [
+const COLUMNS: { key: SortKey | null; label: string; srOnly?: boolean }[] = [
   { key: 'created_at', label: 'Submitted' },
   { key: 'name', label: 'Name' },
   { key: 'attending', label: 'Attending' },
@@ -23,7 +23,7 @@ const COLUMNS: { key: SortKey | null; label: string }[] = [
   { key: 'dinner_interested', label: 'Dinner' },
   { key: 'cruise_interested', label: 'Cruise' },
   { key: null, label: 'Note' },
-  { key: null, label: '' },
+  { key: null, label: 'Actions', srOnly: true },
 ];
 
 const WINDOW_LABELS = { window_1: '6/30-7/6', window_2: '7/7-7/13', window_3: '7/14-7/18' } as const;
@@ -40,6 +40,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   const stats = computeResponsesStats(items);
 
   function handleSort(key: SortKey) {
+    setDeleteError(null);
     if (key === sortKey) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -49,6 +50,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   }
 
   function handleDownload() {
+    setDeleteError(null);
     const csv = buildResponsesCsv(items);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -83,20 +85,22 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-sage">
         <span>
-          Attending: {stats.totalAttending} / {stats.totalResponses}
+          Attending: {stats.totalGuests} guests ({stats.totalAttending}/{stats.totalResponses} responses)
         </span>
         <span>Avg hotel stay: {stats.avgHotelNights == null ? '—' : `${stats.avgHotelNights} nights`}</span>
         <span>
           Window priority:{' '}
           {WINDOW_KEYS.map((key, i) => (
-            <span key={key} className={stats.topPriorityWindow === key ? 'font-bold text-cream' : undefined}>
+            <span key={key}>
               {i > 0 ? ' · ' : ''}
-              {WINDOW_LABELS[key]} {stats.windowPriorityCounts[key]}
+              <span className={stats.topPriorityWindow === key ? 'font-bold text-cream' : undefined}>
+                {WINDOW_LABELS[key]} {stats.windowPriorityCounts[key]}
+              </span>
             </span>
           ))}
         </span>
-        <span>Dinner: {stats.dinnerYesCount} yes</span>
-        <span>Cruise: {stats.cruiseYesCount} yes</span>
+        <span>Dinner: {stats.dinnerGuestCount} guests interested</span>
+        <span>Cruise: {stats.cruiseGuestCount} guests interested</span>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
@@ -128,6 +132,8 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
                     {col.label}
                     {sortKey === col.key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
                   </button>
+                ) : col.srOnly ? (
+                  <span className="sr-only">{col.label}</span>
                 ) : (
                   col.label
                 )}

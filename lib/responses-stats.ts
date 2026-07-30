@@ -8,6 +8,9 @@ export interface ResponsesStats {
   topPriorityWindow: 'window_1' | 'window_2' | 'window_3' | null;
   dinnerYesCount: number;
   cruiseYesCount: number;
+  totalGuests: number;
+  dinnerGuestCount: number;
+  cruiseGuestCount: number;
 }
 
 export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
@@ -37,6 +40,16 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
   const dinnerYesCount = rows.filter((r) => r.dinner_interested === true).length;
   const cruiseYesCount = rows.filter((r) => r.cruise_interested === true).length;
 
+  const totalGuests = rows
+    .filter((r) => r.attending === true)
+    .reduce((sum, r) => sum + (r.party_size ?? 0), 0);
+  const dinnerGuestCount = rows
+    .filter((r) => r.dinner_interested === true)
+    .reduce((sum, r) => sum + (r.party_size ?? 0), 0);
+  const cruiseGuestCount = rows
+    .filter((r) => r.cruise_interested === true)
+    .reduce((sum, r) => sum + (r.party_size ?? 0), 0);
+
   return {
     totalResponses,
     totalAttending,
@@ -45,5 +58,8 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
     topPriorityWindow,
     dinnerYesCount,
     cruiseYesCount,
+    totalGuests,
+    dinnerGuestCount,
+    cruiseGuestCount,
   };
 }

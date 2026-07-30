@@ -89,4 +89,43 @@ describe('computeResponsesStats', () => {
     expect(stats.dinnerYesCount).toBe(2);
     expect(stats.cruiseYesCount).toBe(1);
   });
+
+  it('reports zero guest counts for an empty list', () => {
+    const stats = computeResponsesStats([]);
+    expect(stats.totalGuests).toBe(0);
+    expect(stats.dinnerGuestCount).toBe(0);
+    expect(stats.cruiseGuestCount).toBe(0);
+  });
+
+  it('sums party sizes of attending rows for totalGuests, ignoring non-attending rows', () => {
+    const rows = [
+      row({ attending: true, party_size: 4 }),
+      row({ attending: true, party_size: 2 }),
+      row({ attending: false, party_size: 6 }),
+    ];
+    expect(computeResponsesStats(rows).totalGuests).toBe(6);
+  });
+
+  it('treats a null party_size as 0 when summing totalGuests', () => {
+    const rows = [row({ attending: true, party_size: null }), row({ attending: true, party_size: 3 })];
+    expect(computeResponsesStats(rows).totalGuests).toBe(3);
+  });
+
+  it('sums party sizes across dinner-interested rows rather than counting them', () => {
+    const rows = [
+      row({ dinner_interested: true, party_size: 5 }),
+      row({ dinner_interested: true, party_size: 1 }),
+      row({ dinner_interested: false, party_size: 9 }),
+    ];
+    expect(computeResponsesStats(rows).dinnerGuestCount).toBe(6);
+  });
+
+  it('sums party sizes across cruise-interested rows rather than counting them', () => {
+    const rows = [
+      row({ cruise_interested: true, party_size: 2 }),
+      row({ cruise_interested: true, party_size: 7 }),
+      row({ cruise_interested: null, party_size: 9 }),
+    ];
+    expect(computeResponsesStats(rows).cruiseGuestCount).toBe(9);
+  });
 });
