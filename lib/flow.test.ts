@@ -27,6 +27,12 @@ describe('getNextModule', () => {
   });
 });
 
+describe('getNextModule — letter', () => {
+  it('routes letter unconditionally to opening', () => {
+    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('opening');
+  });
+});
+
 describe('canAdvanceFromOpening', () => {
   it('requires a name and an attending answer', () => {
     expect(canAdvanceFromOpening(EMPTY_DRAFT)).toBe(false);

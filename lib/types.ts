@@ -1,4 +1,4 @@
-export type ModuleId = 'opening' | 'hotel' | 'dateWindows' | 'travelTiming' | 'dinnerCruise' | 'closing';
+export type ModuleId = 'letter' | 'opening' | 'hotel' | 'dateWindows' | 'travelTiming' | 'dinnerCruise' | 'closing';
 
 export type WindowKey = 'window_1' | 'window_2' | 'window_3';
 

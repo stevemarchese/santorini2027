@@ -2,6 +2,8 @@ import type { DraftResponse, ModuleId, WindowKey } from './types';
 
 export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId {
   switch (current) {
+    case 'letter':
+      return 'opening';
     case 'opening':
       return draft.attending ? 'hotel' : 'closing';
     case 'hotel':
