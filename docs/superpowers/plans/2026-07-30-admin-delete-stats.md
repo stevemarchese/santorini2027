@@ -212,6 +212,7 @@ git commit -m "Add computeResponsesStats helper for admin summary bar"
 
 **Files:**
 - Modify: `lib/supabase-admin.ts`
+- Modify: `lib/supabase-admin.test.ts` (already exists — add to it, don't replace it)
 - Create: `app/api/admin/responses/[id]/route.ts`
 - Test: `app/api/admin/responses/[id]/route.test.ts`
 
@@ -219,34 +220,37 @@ git commit -m "Add computeResponsesStats helper for admin summary bar"
 - Consumes: `isAdminAuthed()` from `lib/admin-session.ts` (existing, returns `Promise<boolean>`), `getSupabaseAdminClient()` from `lib/supabase-admin.ts` (existing).
 - Produces: `deleteResponse(id: string): Promise<{ error: string | null }>` (exported from `lib/supabase-admin.ts`, used by the route in this task); the route exports `DELETE`, consumed by Task 3's fetch call to `/api/admin/responses/${id}`.
 
-- [ ] **Step 1: Write the failing test for `deleteResponse`** — append to a new file `lib/supabase-admin.test.ts`
+- [ ] **Step 1: Write the failing test for `deleteResponse`** — `lib/supabase-admin.test.ts` already exists (added on another machine, has `getSupabaseAdminClient`/`getAllResponses` tests using a module-level `fromMock` + dynamic `import('./supabase-admin')` pattern because each test needs fresh env vars via `vi.resetModules()`). Add a new `describe('deleteResponse', ...)` block at the end of the file, in that same style — do NOT create a new file or use static `import`/top-level `vi.mock` with a different shape:
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest';
-
-const deleteMock = vi.fn();
-const eqMock = vi.fn();
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ from: () => ({ delete: deleteMock }) }),
-}));
-
-import { deleteResponse } from './supabase-admin';
-
 describe('deleteResponse', () => {
-  it('deletes by id and returns no error on success', async () => {
-    deleteMock.mockReturnValue({ eq: eqMock.mockResolvedValue({ error: null }) });
+  beforeEach(() => {
+    vi.resetModules();
     process.env.SUPABASE_URL = 'https://example.supabase.co';
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'key';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+  });
+
+  it('deletes by id and returns no error on success', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: null });
+    const del = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ delete: del });
+
+    const { deleteResponse } = await import('./supabase-admin');
     const result = await deleteResponse('abc-123');
-    expect(eqMock).toHaveBeenCalledWith('id', 'abc-123');
+
+    expect(fromMock).toHaveBeenCalledWith('responses');
+    expect(eq).toHaveBeenCalledWith('id', 'abc-123');
     expect(result).toEqual({ error: null });
   });
 
   it('returns the error message on failure', async () => {
-    deleteMock.mockReturnValue({ eq: eqMock.mockResolvedValue({ error: { message: 'boom' } }) });
-    process.env.SUPABASE_URL = 'https://example.supabase.co';
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'key';
+    const eq = vi.fn().mockResolvedValue({ error: { message: 'boom' } });
+    const del = vi.fn(() => ({ eq }));
+    fromMock.mockReturnValue({ delete: del });
+
+    const { deleteResponse } = await import('./supabase-admin');
     const result = await deleteResponse('abc-123');
+
     expect(result).toEqual({ error: 'boom' });
   });
 });
@@ -255,7 +259,7 @@ describe('deleteResponse', () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run lib/supabase-admin.test.ts`
-Expected: FAIL — `deleteResponse` is not exported.
+Expected: FAIL — `deleteResponse` is not exported (the file's other tests still pass).
 
 - [ ] **Step 3: Add `deleteResponse` to `lib/supabase-admin.ts`**
 
@@ -272,7 +276,7 @@ export async function deleteResponse(id: string): Promise<{ error: string | null
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run lib/supabase-admin.test.ts`
-Expected: PASS (2 tests).
+Expected: PASS (5 tests — 3 pre-existing + 2 new).
 
 - [ ] **Step 5: Commit**
 
