@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Hero from '@/components/Hero';
 import AboutIcon from '@/components/AboutIcon';
+import WeatherWidget from '@/components/WeatherWidget';
 import LetterModule from '@/components/modules/LetterModule';
 import OpeningModule from '@/components/modules/OpeningModule';
 import HotelModule from '@/components/modules/HotelModule';
@@ -26,6 +27,7 @@ export default function Home() {
     <main>
       <Hero />
       <AboutIcon visible={moduleId !== 'letter'} />
+      <WeatherWidget />
       {moduleId === 'letter' && <LetterModule draft={draft} onAdvance={advance} />}
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
       {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} />}
