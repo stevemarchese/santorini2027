@@ -41,7 +41,7 @@ export default function Wizard({ content }: WizardProps) {
   return (
     <main>
       <Hero />
-      <AboutIcon visible={moduleId !== 'letter'} />
+      <AboutIcon visible={moduleId !== 'letter'} paragraphs={letterParagraphs} />
       <WeatherWidget />
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
       {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
