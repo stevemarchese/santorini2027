@@ -18,4 +18,13 @@ describe('HeroBoats', () => {
     expect(wrapper).toHaveAttribute('aria-hidden', 'true');
     expect(wrapper.className).toContain('pointer-events-none');
   });
+
+  it('sizes each svg element directly, not just its wrapper div', () => {
+    const { container } = render(<HeroBoats />);
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs).toHaveLength(4);
+    svgs.forEach((svg) => {
+      expect(svg.getAttribute('class')).toMatch(/h-/);
+    });
+  });
 });
