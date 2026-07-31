@@ -11,17 +11,17 @@ export default function Hero() {
     if (videoRef.current) {
       videoRef.current.setAttribute('muted', 'muted');
     }
-    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    setReducedMotion(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false);
   }, []);
 
   const showMotion = ended && !reducedMotion;
 
   return (
     <div className="hero-stage">
-      <div className="hero-stage-surface">
+      <div className={`hero-stage-surface${showMotion ? ' animate-hero-breathe' : ''}`}>
         <video
           ref={videoRef}
-          className={`h-full w-full object-cover${showMotion ? ' animate-hero-breathe' : ''}`}
+          className="h-full w-full object-cover"
           src="/santorini_2027.mp4"
           autoPlay
           muted

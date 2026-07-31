@@ -28,15 +28,16 @@ describe('Hero', () => {
     expect(video).not.toHaveAttribute('loop');
   });
 
-  it('adds the breathing-zoom class and renders the boats overlay once the video ends', () => {
+  it('adds the breathing-zoom class to the stage surface and renders the boats overlay once the video ends', () => {
     const { container } = render(<Hero />);
     const video = container.querySelector('video') as HTMLVideoElement;
-    expect(video.className).not.toContain('animate-hero-breathe');
+    const surface = container.querySelector('.hero-stage-surface') as HTMLElement;
+    expect(surface.className).not.toContain('animate-hero-breathe');
     expect(container.querySelectorAll('svg')).toHaveLength(0);
 
     fireEvent.ended(video);
 
-    expect(video.className).toContain('animate-hero-breathe');
+    expect(surface.className).toContain('animate-hero-breathe');
     expect(container.querySelectorAll('svg')).toHaveLength(4);
   });
 
@@ -44,10 +45,11 @@ describe('Hero', () => {
     stubMatchMedia(true);
     const { container } = render(<Hero />);
     const video = container.querySelector('video') as HTMLVideoElement;
+    const surface = container.querySelector('.hero-stage-surface') as HTMLElement;
 
     fireEvent.ended(video);
 
-    expect(video.className).not.toContain('animate-hero-breathe');
+    expect(surface.className).not.toContain('animate-hero-breathe');
     expect(container.querySelectorAll('svg')).toHaveLength(0);
   });
 });

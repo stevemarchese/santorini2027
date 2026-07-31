@@ -19,7 +19,7 @@ Purely decorative — no new state in the RSVP flow, no interaction, no effect o
 
 Chosen and refined live in the browser-based brainstorming companion, using real CSS animations over the actual still frame:
 
-1. **Breathing zoom** — the whole frame slowly pulses scale 1 → ~1.035 → 1 on an ease-in-out loop (~12s cycle). Applied to the frozen video element itself once it ends.
+1. **Breathing zoom** — the whole frame slowly pulses scale 1 → ~1.035 → 1 on an ease-in-out loop (~12s cycle). Applied to the shared `.hero-stage-surface` wrapper (video + boats together) once the video ends, so the boats scale in lockstep with the water instead of drifting out of sync with it.
 2. **Four boats**, using the client's four provided Noun Project SVGs (`noun-boat-175154.svg`, `noun-boat-4551761.svg`, `noun-boat-8350556.svg`, `noun-boat-8419088.svg`), all rendered in a single cream color (`#DED5BD`) with a soft drop-shadow for contrast against the water.
 3. Each boat follows a **4-waypoint zigzag** within a pixel-verified water-only "pocket" — it drifts to a waypoint, pauses briefly (as if idling), then heads off at a different angle, rather than simply reversing on one line. `scaleX(-1)` flips the boat to face its direction of travel at each turn.
 4. Boats never cross land: every waypoint and the straight line between consecutive waypoints was confirmed, via row-by-row pixel sampling of `santorini-og-frame.jpg`, to stay within a contiguous water-colored region for its full vertical span.
@@ -33,7 +33,7 @@ Derived by sampling the JPG's pixel colors row-by-row and finding the widest con
 | 1 | `noun-boat-175154.svg` | x 37–49%, y 59–68% | Caldera basin, lower-wide area, below the small central island |
 | 4 | `noun-boat-8419088.svg` | x 38–48%, y 61–67% | Same general pocket as Boat 1, offset sub-area + different phase/timing so they don't sync or collide |
 | 2 | `noun-boat-4551761.svg` | x 39–50%, y 24–34% | Caldera basin, upper area, above the small central island, below the northern peninsula's dip |
-| 3 | `noun-boat-8350556.svg` | x 21–27%, y 47–55% | Outer light-blue water ring, narrow channel between the western peninsula and the main landmass — smaller pocket, boat sized up (24px) specifically to stay visible here |
+| 3 | `noun-boat-8350556.svg` | x 33–37%, y 55–56.5% | Caldera basin, middle band between the boat-1/4 pocket (below) and the boat-2 pocket (above) — relocated here from the original outer light-ring channel, which turned out to have near-zero contrast for a cream boat and was cropped off-screen on portrait viewports |
 
 ### Timing (final, after iteration)
 
