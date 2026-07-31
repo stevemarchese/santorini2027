@@ -31,3 +31,90 @@
 .blob-panel {
   border-radius: 2rem 1.25rem 2rem 1.25rem / 1.25rem 2rem 1.25rem 2rem;
 }
+
+/* Hero ambient boats */
+@keyframes hero-boats-fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-hero-boats-fadein {
+  animation: hero-boats-fadein 1s ease-out forwards;
+}
+
+.hero-boat {
+  position: absolute;
+}
+
+@keyframes hero-boat-1-drift {
+  0%   { left: 49%; top: 60%; transform: scaleX(-1); }
+  10%  { left: 49%; top: 60%; transform: scaleX(-1); }
+  25%  { left: 38%; top: 67%; transform: scaleX(-1); }
+  35%  { left: 38%; top: 67%; transform: scaleX(1); }
+  50%  { left: 45%; top: 59%; transform: scaleX(1); }
+  60%  { left: 45%; top: 59%; transform: scaleX(-1); }
+  75%  { left: 37%; top: 64%; transform: scaleX(-1); }
+  85%  { left: 37%; top: 64%; transform: scaleX(1); }
+  100% { left: 49%; top: 60%; transform: scaleX(1); }
+}
+
+.hero-boat-1 {
+  left: 49%;
+  top: 60%;
+  animation: hero-boat-1-drift 41s ease-in-out infinite;
+}
+
+@keyframes hero-boat-4-drift {
+  0%   { left: 48%; top: 62%; transform: scaleX(1); }
+  10%  { left: 48%; top: 62%; transform: scaleX(1); }
+  25%  { left: 38%; top: 66%; transform: scaleX(1); }
+  35%  { left: 38%; top: 66%; transform: scaleX(-1); }
+  50%  { left: 44%; top: 61%; transform: scaleX(-1); }
+  60%  { left: 44%; top: 61%; transform: scaleX(1); }
+  75%  { left: 39%; top: 65%; transform: scaleX(1); }
+  85%  { left: 39%; top: 65%; transform: scaleX(-1); }
+  100% { left: 48%; top: 62%; transform: scaleX(-1); }
+}
+
+.hero-boat-4 {
+  left: 48%;
+  top: 62%;
+  animation: hero-boat-4-drift 44s ease-in-out infinite;
+  animation-delay: 5s;
+}
+
+@keyframes hero-boat-2-drift {
+  0%   { left: 39%; top: 25%; transform: scaleX(1); }
+  10%  { left: 39%; top: 25%; transform: scaleX(1); }
+  25%  { left: 50%; top: 33%; transform: scaleX(1); }
+  35%  { left: 50%; top: 33%; transform: scaleX(-1); }
+  50%  { left: 41%; top: 27%; transform: scaleX(-1); }
+  60%  { left: 41%; top: 27%; transform: scaleX(1); }
+  75%  { left: 48%; top: 32%; transform: scaleX(1); }
+  85%  { left: 48%; top: 32%; transform: scaleX(-1); }
+  100% { left: 39%; top: 25%; transform: scaleX(-1); }
+}
+
+.hero-boat-2 {
+  left: 39%;
+  top: 25%;
+  animation: hero-boat-2-drift 40s ease-in-out infinite;
+}
+
+@keyframes hero-boat-3-drift {
+  0%   { left: 21%; top: 47%; }
+  10%  { left: 21%; top: 47%; }
+  25%  { left: 26%; top: 55%; }
+  35%  { left: 26%; top: 55%; }
+  50%  { left: 22%; top: 49%; }
+  60%  { left: 22%; top: 49%; }
+  75%  { left: 27%; top: 54%; }
+  85%  { left: 27%; top: 54%; }
+  100% { left: 21%; top: 47%; }
+}
+
+.hero-boat-3 {
+  left: 21%;
+  top: 47%;
+  animation: hero-boat-3-drift 35s ease-in-out infinite;
+}
