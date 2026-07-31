@@ -39,7 +39,7 @@ Derived by sampling the JPG's pixel colors row-by-row and finding the widest con
 
 - Breathing zoom: 12s ease-in-out, infinite.
 - Boat 1: 41s per full 4-waypoint loop.
-- Boat 4: 44s, 5s animation-delay (offset from Boat 1).
+- Boat 4: 44s, -5s animation-delay (starts 5s into its cycle immediately, rather than sitting frozen before its first move — offset from Boat 1).
 - Boat 2: 40s.
 - Boat 3: 35s.
 - All use a "hold at waypoint, then move to next" keyframe pattern (holds at 0%/10%, 25%/35%, 50%/60%, 75%/85%, loop closes at 100%) so boats visibly pause before changing direction rather than moving continuously.
