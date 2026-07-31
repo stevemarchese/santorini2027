@@ -1,23 +1,35 @@
 'use client';
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import HeroBoats from '@/components/HeroBoats';
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [ended, setEnded] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.setAttribute('muted', 'muted');
     }
+    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, []);
 
+  const showMotion = ended && !reducedMotion;
+
   return (
-    <video
-      ref={videoRef}
-      className="fixed inset-0 z-0 h-full w-full object-cover"
-      src="/santorini_2027.mp4"
-      autoPlay
-      muted
-      playsInline
-    />
+    <div className="hero-stage">
+      <div className="hero-stage-surface">
+        <video
+          ref={videoRef}
+          className={`h-full w-full object-cover${showMotion ? ' animate-hero-breathe' : ''}`}
+          src="/santorini_2027.mp4"
+          autoPlay
+          muted
+          playsInline
+          onEnded={() => setEnded(true)}
+        />
+        {showMotion && <HeroBoats />}
+      </div>
+    </div>
   );
 }

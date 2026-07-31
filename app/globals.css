@@ -118,3 +118,32 @@
   top: 47%;
   animation: hero-boat-3-drift 35s ease-in-out infinite;
 }
+
+/* Hero stage: keeps the video + boats overlay in one 16:9 coordinate
+   system that covers the viewport identically at any screen size */
+.hero-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-stage-surface {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 56.25vw; /* 100vw / (16/9) */
+  min-height: 100vh;
+  min-width: 177.78vh; /* 100vh * (16/9) */
+}
+
+@keyframes hero-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+.animate-hero-breathe {
+  animation: hero-breathe 12s ease-in-out infinite;
+}
