@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import type { DraftResponse } from '@/lib/types';
 
 interface ClosingModuleProps {
@@ -45,9 +46,11 @@ export default function ClosingModule({
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
-        {draft.attending ? 'One last thing' : 'Sorry to miss you'}
-      </h2>
+      <ModuleWaveHeader
+        title={draft.attending ? 'One LaSt ThIng' : 'SorRy To MiSs You'}
+        subtitle={draft.attending ? 'Anything else to add?' : "We'll miss you"}
+        titleClassName="text-[24px]"
+      />
       <label htmlFor="note" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
         Anything else you'd like to share with us as we get things set up?
       </label>
@@ -57,7 +60,7 @@ export default function ClosingModule({
         value={note}
         onChange={(event) => setNote(event.target.value)}
       />
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-10 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}

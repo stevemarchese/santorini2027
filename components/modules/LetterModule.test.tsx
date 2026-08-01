@@ -20,7 +20,7 @@ describe('LetterModule', () => {
 
   it('renders the Dirtyline title above the letter paragraphs', () => {
     render(<LetterModule draft={EMPTY_DRAFT} paragraphs={['A paragraph.']} onAdvance={vi.fn()} />);
-    expect(screen.getByText("Time flies. let's have fun.")).toBeInTheDocument();
+    expect(screen.getByText("Time flieS. let's hAve fun!")).toBeInTheDocument();
   });
 
   it('renders inside a wide ModulePanel', () => {

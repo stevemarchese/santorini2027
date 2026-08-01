@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
+import ExpandableSection from '@/components/ExpandableSection';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import { canAdvanceFromHotel } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
 
@@ -25,10 +27,11 @@ export default function HotelModule({ draft, onAdvance, onBack }: HotelModulePro
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
+      <ModuleWaveHeader title="ThE HoTel" subtitle="Where you'll rest your head" titleClassName="text-[24px]" />
+      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
         Do you plan on staying at the Adamastos Hotel? *
-      </h2>
-      <div className="mt-4 flex gap-3">
+      </p>
+      <div className="mt-2 flex gap-3">
         <button
           type="button"
           onClick={() => setLocal({ ...local, hotelStaying: true })}
@@ -48,26 +51,24 @@ export default function HotelModule({ draft, onAdvance, onBack }: HotelModulePro
           No
         </button>
       </div>
-      {local.hotelStaying === true && (
-        <>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">For how many nights? *</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {NIGHTS_OPTIONS.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setLocal({ ...local, hotelNights: value })}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
-                  local.hotelNights === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-      <div className="mt-6 flex items-center justify-between">
+      <ExpandableSection open={local.hotelStaying === true}>
+        <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">For how many nights? *</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          {NIGHTS_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setLocal({ ...local, hotelNights: value })}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
+                local.hotelNights === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </ExpandableSection>
+      <div className="mt-10 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}

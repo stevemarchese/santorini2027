@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import type { DraftResponse } from '@/lib/types';
 
 interface DinnerCruiseModuleProps {
@@ -14,8 +15,8 @@ export default function DinnerCruiseModule({ draft, onAdvance, onBack }: DinnerC
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">A couple more things</h2>
-      <label className="mt-4 flex items-center gap-2 text-sm text-cream">
+      <ModuleWaveHeader title="A CouPle MoRe ThIngs" subtitle="A few fun extras" titleClassName="text-[24px]" />
+      <label className="flex items-center gap-2 text-sm text-cream">
         <input
           type="checkbox"
           checked={local.dinnerInterested}
@@ -31,7 +32,7 @@ export default function DinnerCruiseModule({ draft, onAdvance, onBack }: DinnerC
         />
         Would you join us for a sunset cruise and swim?
       </label>
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-10 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}

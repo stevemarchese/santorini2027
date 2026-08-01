@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import SignatureLine, { isSignatureParagraph } from '@/components/SignatureLine';
-import { dirtyline } from '@/lib/dirtyline-font';
 
 function LetterGlyph({ className }: { className?: string }) {
   return (
@@ -41,17 +41,15 @@ export default function AboutIcon({ visible, paragraphs, onOpenChange }: AboutIc
       {open && (
         <div className="fixed inset-0 z-30 flex items-center justify-center p-6">
           <div className="animate-module-in blob-panel relative max-h-dvh w-full max-w-2xl overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
+            <ModuleWaveHeader title="Time flieS. let's hAve fun!" centered titleClassName="text-[28px] -translate-y-[10px]" />
             <button
               type="button"
               onClick={() => updateOpen(false)}
               aria-label="Close"
-              className="absolute right-4 top-4 text-xl leading-none text-cream/70 hover:text-cream"
+              className="absolute right-4 top-4 text-xl leading-none text-navy/70 hover:text-navy"
             >
               ×
             </button>
-            <h1 className={`${dirtyline.className} text-[clamp(17px,4vw,22px)] text-cream`}>
-              Time flies. let&apos;s have fun.
-            </h1>
             {paragraphs.map((paragraph, index) =>
               isSignatureParagraph(paragraph) ? (
                 <SignatureLine key={index} paragraph={paragraph} />

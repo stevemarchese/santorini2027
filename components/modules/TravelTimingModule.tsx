@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import { canAdvanceFromTravelTiming } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
 
@@ -22,9 +23,14 @@ export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelT
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
+      <ModuleWaveHeader
+        title="TraVel PlaNs"
+        subtitle="Before, after, or both?"
+        titleClassName="text-[24px]"
+      />
+      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
         Traveling before or after Santorini? *
-      </h2>
+      </p>
       <div className="mt-4 flex flex-wrap gap-3">
         {OPTIONS.map(({ value, label }) => (
           <button
@@ -48,7 +54,7 @@ export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelT
         value={local.travelNote}
         onChange={(event) => setLocal({ ...local, travelNote: event.target.value })}
       />
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-10 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}

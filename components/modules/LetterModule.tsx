@@ -1,8 +1,8 @@
 'use client';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import PillButton from '@/components/PillButton';
 import SignatureLine, { isSignatureParagraph } from '@/components/SignatureLine';
-import { dirtyline } from '@/lib/dirtyline-font';
 import type { DraftResponse } from '@/lib/types';
 
 interface LetterModuleProps {
@@ -14,9 +14,7 @@ interface LetterModuleProps {
 export default function LetterModule({ draft, paragraphs, onAdvance }: LetterModuleProps) {
   return (
     <ModulePanel draggable wide>
-      <h1 className={`${dirtyline.className} text-[clamp(17px,4vw,22px)] text-cream`}>
-        Time flies. let&apos;s have fun.
-      </h1>
+      <ModuleWaveHeader title="Time flieS. let's hAve fun!" centered titleClassName="text-[28px] -translate-y-[10px]" />
       {paragraphs.map((paragraph, index) =>
         isSignatureParagraph(paragraph) ? (
           <SignatureLine key={index} paragraph={paragraph} />

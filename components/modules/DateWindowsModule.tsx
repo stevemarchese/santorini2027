@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import { canAdvanceFromDateWindows, toggleWindow, setWindowPriority } from '@/lib/flow';
 import type { DraftResponse, WindowKey } from '@/lib/types';
 
@@ -21,7 +22,8 @@ export default function DateWindowsModule({ draft, onAdvance, onBack }: DateWind
 
   return (
     <ModulePanel>
-      <h2 className="text-xl font-bold uppercase tracking-wide text-cream">Which week works best for you? *</h2>
+      <ModuleWaveHeader title="PiCk YouR WeeK" subtitle="Pick what works for you" titleClassName="text-[24px]" />
+      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Which week works best for you? *</p>
       <p className="mt-1 text-xs text-sage">Select all that apply — if more than one works, you can flag your favorite below.</p>
       <div className="mt-4 flex flex-col gap-3">
         {WINDOWS.map(({ key, label, field }) => (
@@ -48,7 +50,7 @@ export default function DateWindowsModule({ draft, onAdvance, onBack }: DateWind
           </div>
         ))}
       </div>
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-10 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}

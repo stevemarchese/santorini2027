@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
+import ExpandableSection from '@/components/ExpandableSection';
 import ModulePanel from '@/components/ModulePanel';
+import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import QuizGate from '@/components/QuizGate';
 import { canAdvanceFromOpening } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
@@ -42,10 +44,13 @@ export default function OpeningModule({ draft, onAdvance, quizPassed, onQuizPass
 
   return (
     <ModulePanel draggable>
-      <h1 className="text-xl font-bold uppercase tracking-wide text-cream">Join us in Santorini</h1>
-      <p className="mt-2 text-xs font-bold uppercase tracking-widest text-cream/70">20 years — 2007 to 2027</p>
+      <ModuleWaveHeader
+        title="Start wiTh The baSics"
+        subtitle="The simple questions"
+        titleClassName="text-[24px]"
+      />
       <label htmlFor="name" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-        NAME *
+        NAME/FAMILY NAME *
       </label>
       <input
         id="name"
@@ -84,26 +89,24 @@ export default function OpeningModule({ draft, onAdvance, quizPassed, onQuizPass
           Can&apos;t make it
         </button>
       </div>
-      {local.attending === true && (
-        <>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setLocal({ ...local, partySize: value })}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
-                  local.partySize === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-      <div className="mt-6 flex items-center justify-between">
+      <ExpandableSection open={local.attending === true}>
+        <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setLocal({ ...local, partySize: value })}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
+                local.partySize === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </ExpandableSection>
+      <div className="mt-10 flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-widest text-sage/70">*required</p>
         <button
           type="button"

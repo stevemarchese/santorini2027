@@ -50,7 +50,7 @@ describe('OpeningModule', () => {
   it('shows a required-field legend and asterisks on Name and Are you planning on coming?', () => {
     render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
     expect(screen.getByText('*required')).toBeInTheDocument();
-    expect(screen.getByText('NAME *')).toBeInTheDocument();
+    expect(screen.getByText('NAME/FAMILY NAME *')).toBeInTheDocument();
     expect(screen.getByText('Are you planning on coming? *')).toBeInTheDocument();
   });
 

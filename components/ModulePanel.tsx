@@ -70,7 +70,7 @@ export default function ModulePanel({ children, draggable = false, wide = false 
               }
             : undefined
         }
-        className={`animate-module-in blob-panel min-h-0 max-h-dvh w-full overflow-y-auto border border-terracotta/40 bg-navy/[0.82] p-10 backdrop-blur-md ${widthClasses}`}
+        className={`animate-module-in blob-panel min-h-0 max-h-dvh w-full overflow-y-auto border border-terracotta/40 bg-navy/[0.82] px-10 pt-10 pb-14 backdrop-blur-md ${widthClasses}`}
       >
         {children}
       </div>
