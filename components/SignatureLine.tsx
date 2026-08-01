@@ -17,7 +17,7 @@ export default function SignatureLine({ paragraph }: SignatureLineProps) {
 
   return (
     <p className="mt-4 text-[clamp(14px,3.5vw,18px)] text-cream first:mt-0">
-      {before}
+      {before && <span className="text-[16px]">{before}</span>}
       {before && <br />}
       <span className={dirtyline.className}>S</span>teve,{' '}
       <span className={dirtyline.className}>A</span>ndi &{' '}
