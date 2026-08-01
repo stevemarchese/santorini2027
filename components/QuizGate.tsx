@@ -46,7 +46,7 @@ export default function QuizGate({ onPass }: QuizGateProps) {
               key={option}
               type="button"
               onClick={() => handleAnswer(option)}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
+              className={`quiz-option rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
                 isWrong ? 'bg-navy/40 text-cream/40' : 'bg-cream text-navy'
               }`}
             >
