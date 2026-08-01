@@ -17,4 +17,17 @@ describe('LetterModule', () => {
     await user.click(screen.getByRole('button', { name: /^next/i }));
     expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
   });
+
+  it('renders the Dirtyline title above the letter paragraphs', () => {
+    render(<LetterModule draft={EMPTY_DRAFT} paragraphs={['A paragraph.']} onAdvance={vi.fn()} />);
+    expect(screen.getByText("Time flies. Let's have fun.")).toBeInTheDocument();
+  });
+
+  it('renders inside a wide ModulePanel', () => {
+    const { container } = render(
+      <LetterModule draft={EMPTY_DRAFT} paragraphs={['A paragraph.']} onAdvance={vi.fn()} />
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    expect(panel.className).toContain('max-w-2xl');
+  });
 });

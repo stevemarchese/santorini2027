@@ -4,6 +4,7 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 interface ModulePanelProps {
   children: React.ReactNode;
   draggable?: boolean;
+  wide?: boolean;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -13,7 +14,7 @@ function clamp(value: number, min: number, max: number) {
 const INTERACTIVE_SELECTOR = 'input, button, textarea, select, a, label';
 const MOBILE_BREAKPOINT_PX = 640;
 
-export default function ModulePanel({ children, draggable = false }: ModulePanelProps) {
+export default function ModulePanel({ children, draggable = false, wide = false }: ModulePanelProps) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
@@ -49,6 +50,10 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
     setIsDragging(false);
   }
 
+  const widthClasses = wide
+    ? 'max-w-2xl'
+    : 'max-w-md ml-0 sm:ml-[60px] md:ml-[140px] lg:ml-[220px] xl:ml-[320px] 2xl:ml-[380px]';
+
   return (
     <div className="relative z-10 flex min-h-dvh items-center justify-center p-6">
       <div
@@ -65,7 +70,7 @@ export default function ModulePanel({ children, draggable = false }: ModulePanel
               }
             : undefined
         }
-        className="animate-module-in blob-panel min-h-0 max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.82] p-10 backdrop-blur-md ml-0 sm:ml-[60px] md:ml-[140px] lg:ml-[220px] xl:ml-[320px] 2xl:ml-[380px]"
+        className={`animate-module-in blob-panel min-h-0 max-h-dvh w-full overflow-y-auto border border-terracotta/40 bg-navy/[0.82] p-10 backdrop-blur-md ${widthClasses}`}
       >
         {children}
       </div>

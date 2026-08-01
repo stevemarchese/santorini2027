@@ -1,5 +1,6 @@
 'use client';
 import ModulePanel from '@/components/ModulePanel';
+import { dirtyline } from '@/lib/fonts';
 import type { DraftResponse } from '@/lib/types';
 
 interface LetterModuleProps {
@@ -10,7 +11,8 @@ interface LetterModuleProps {
 
 export default function LetterModule({ draft, paragraphs, onAdvance }: LetterModuleProps) {
   return (
-    <ModulePanel draggable>
+    <ModulePanel draggable wide>
+      <h1 className={`${dirtyline.className} text-xl text-cream`}>Time flies. Let&apos;s have fun.</h1>
       {paragraphs.map((paragraph, index) => (
         <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
           {paragraph}

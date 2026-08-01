@@ -21,6 +21,29 @@ describe('ModulePanel', () => {
     expect(screen.getByText('Hello')).toBeInTheDocument();
   });
 
+  it('uses max-w-2xl with no responsive left offset when wide is true', () => {
+    const { container } = render(
+      <ModulePanel wide>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    expect(panel.className).toContain('max-w-2xl');
+    expect(panel.className).not.toContain('max-w-md');
+    expect(panel.className).not.toContain('ml-[60px]');
+  });
+
+  it("keeps today's max-w-md and offset classes when wide is omitted", () => {
+    const { container } = render(
+      <ModulePanel>
+        <p>Hello</p>
+      </ModulePanel>
+    );
+    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    expect(panel.className).toContain('max-w-md');
+    expect(panel.className).toContain('sm:ml-[60px]');
+  });
+
   it('does not move when draggable is false, even if pointer events fire', () => {
     const { container } = render(
       <ModulePanel>
