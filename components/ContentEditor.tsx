@@ -31,6 +31,7 @@ export default function ContentEditor({ content }: ContentEditorProps) {
       <summary className="flex cursor-pointer list-none items-center gap-2 text-lg font-bold uppercase tracking-wide text-sage">
         <span className="inline-block transition-transform group-open:rotate-90">▸</span>
         Site Content
+        <span className="text-xs font-normal normal-case tracking-normal text-cream/50">(click to expand)</span>
       </summary>
 
       <div className="mt-4">

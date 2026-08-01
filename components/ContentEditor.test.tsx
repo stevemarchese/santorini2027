@@ -19,6 +19,11 @@ describe('ContentEditor', () => {
     expect(screen.queryByLabelText(/^letter$/i)).not.toBeVisible();
   });
 
+  it('shows a click-to-expand hint next to the heading', () => {
+    render(<ContentEditor content={content} />);
+    expect(screen.getByText(/click to expand/i)).toBeInTheDocument();
+  });
+
   it('seeds the fields from the passed content once opened', async () => {
     const user = userEvent.setup();
     render(<ContentEditor content={content} />);
