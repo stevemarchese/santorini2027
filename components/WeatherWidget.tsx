@@ -24,7 +24,11 @@ export async function fetchSantoriniTemperature(): Promise<number> {
   return data.current.temperature_2m;
 }
 
-export default function WeatherWidget() {
+interface WeatherWidgetProps {
+  variant?: 'terracotta' | 'cream';
+}
+
+export default function WeatherWidget({ variant = 'terracotta' }: WeatherWidgetProps) {
   const [temperature, setTemperature] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -36,11 +40,13 @@ export default function WeatherWidget() {
 
   if (failed || temperature === null) return null;
 
+  const colorClass = variant === 'cream' ? 'text-cream' : 'text-terracotta';
+
   return (
-    <div className="fixed right-4 top-4 z-20 flex flex-col items-center text-terracotta">
+    <div className={`fixed right-4 top-4 z-30 flex flex-col items-center ${colorClass}`}>
       <SunGlyph className="h-7 w-7" />
       <span className="mt-1 text-sm font-bold">{Math.round(temperature)}°F</span>
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-terracotta">Santorini</span>
+      <span className="text-[10px] font-semibold uppercase tracking-widest">Santorini</span>
     </div>
   );
 }

@@ -44,7 +44,7 @@ export default function Wizard({ content }: WizardProps) {
     <main>
       <Hero />
       <AboutIcon visible={moduleId !== 'letter' && moduleId !== 'splash'} paragraphs={letterParagraphs} />
-      <WeatherWidget />
+      <WeatherWidget variant={moduleId === 'splash' ? 'cream' : 'terracotta'} />
       {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
       {moduleId === 'opening' && (
