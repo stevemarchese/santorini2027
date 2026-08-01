@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { dirtyline } from '@/lib/dirtyline-font';
 
 function LetterGlyph({ className }: { className?: string }) {
   return (
@@ -12,10 +13,16 @@ function LetterGlyph({ className }: { className?: string }) {
 interface AboutIconProps {
   visible: boolean;
   paragraphs: string[];
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function AboutIcon({ visible, paragraphs }: AboutIconProps) {
+export default function AboutIcon({ visible, paragraphs, onOpenChange }: AboutIconProps) {
   const [open, setOpen] = useState(false);
+
+  function updateOpen(next: boolean) {
+    setOpen(next);
+    onOpenChange?.(next);
+  }
 
   if (!visible) return null;
 
@@ -23,7 +30,7 @@ export default function AboutIcon({ visible, paragraphs }: AboutIconProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => updateOpen(true)}
         aria-label="About this trip"
         className="fixed left-4 top-4 z-20 flex flex-col items-center text-terracotta"
       >
@@ -32,20 +39,31 @@ export default function AboutIcon({ visible, paragraphs }: AboutIconProps) {
       </button>
       {open && (
         <div className="fixed inset-0 z-30 flex items-center justify-center p-6">
-          <div className="animate-module-in blob-panel relative max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
+          <div className="animate-module-in blob-panel relative max-h-dvh w-full max-w-2xl overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => updateOpen(false)}
               aria-label="Close"
               className="absolute right-4 top-4 text-xl leading-none text-cream/70 hover:text-cream"
             >
               ×
             </button>
-            {paragraphs.map((paragraph, index) => (
-              <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
-                {paragraph}
-              </p>
-            ))}
+            <h1 className={`${dirtyline.className} text-[clamp(16px,4vw,22px)] text-cream`}>
+              Time flies. let&apos;s have fun.
+            </h1>
+            {paragraphs.map((paragraph, index) =>
+              paragraph === 'Steve, Andi & Nicolas' ? (
+                <p key={index} className="mt-4 text-[clamp(15px,3.5vw,20px)] text-cream first:mt-0">
+                  <span className={dirtyline.className}>S</span>teve,{' '}
+                  <span className={dirtyline.className}>A</span>ndi &{' '}
+                  <span className={dirtyline.className}>N</span>icolas
+                </p>
+              ) : (
+                <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
+                  {paragraph}
+                </p>
+              )
+            )}
           </div>
         </div>
       )}

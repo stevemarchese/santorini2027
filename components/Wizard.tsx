@@ -25,6 +25,9 @@ export default function Wizard({ content }: WizardProps) {
   const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
   const [history, setHistory] = useState<ModuleId[]>([]);
   const [quizPassed, setQuizPassed] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+
+  const weatherOverlapsPanel = moduleId === 'splash' || moduleId === 'letter' || aboutOpen;
 
   const letterParagraphs = splitParagraphs(content.letter);
 
@@ -43,8 +46,12 @@ export default function Wizard({ content }: WizardProps) {
   return (
     <main>
       <Hero />
-      <AboutIcon visible={moduleId !== 'letter' && moduleId !== 'splash'} paragraphs={letterParagraphs} />
-      <WeatherWidget variant={moduleId === 'splash' ? 'cream' : 'terracotta'} />
+      <AboutIcon
+        visible={moduleId !== 'letter' && moduleId !== 'splash'}
+        paragraphs={letterParagraphs}
+        onOpenChange={setAboutOpen}
+      />
+      <WeatherWidget variant={weatherOverlapsPanel ? 'cream' : 'terracotta'} />
       {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
       {moduleId === 'opening' && (
