@@ -16,6 +16,10 @@ export default defineConfig({
     ],
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, '.') },
+    alias: {
+      '@': path.resolve(__dirname, '.'),
+      'next/font/local': path.resolve(__dirname, 'test-mocks/next-font-local.ts'),
+      'geist/font/sans': path.resolve(__dirname, 'test-mocks/geist-font-sans.ts'),
+    },
   },
 });

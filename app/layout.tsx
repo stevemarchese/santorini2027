@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { GeistSans } from '@/lib/fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={GeistSans.variable}>
       <body className="overflow-hidden bg-navy">{children}</body>
     </html>
   );

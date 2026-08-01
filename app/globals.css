@@ -6,7 +6,7 @@
   --color-teal: #265F6E;
   --color-cream: #DED5BD;
   --color-sage: #9FB3AF;
-  --font-sans: Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-geist-sans), Helvetica, Arial, sans-serif;
 }
 
 @keyframes module-in {
