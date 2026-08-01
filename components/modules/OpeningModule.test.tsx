@@ -8,9 +8,9 @@ describe('OpeningModule', () => {
   it('advances with name, attending, and party size filled in', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={onAdvance} quizPassed={true} onQuizPassed={vi.fn()} />);
 
-    await user.type(screen.getByLabelText(/your name/i), 'Steve');
+    await user.type(screen.getByLabelText(/^name/i), 'Steve');
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
     await user.click(screen.getByRole('button', { name: '+1' }));
     await user.click(screen.getByRole('button', { name: /^next/i }));
@@ -21,12 +21,12 @@ describe('OpeningModule', () => {
   });
 
   it('disables Next until required fields are filled', () => {
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
     expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
   });
 
   it('renders the unselected attending buttons as legible cream pills', () => {
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
     const imInButton = screen.getByRole('button', { name: /i'm in/i });
     expect(imInButton.className).toContain('rounded-full');
     expect(imInButton.className).toContain('bg-cream');
@@ -35,7 +35,7 @@ describe('OpeningModule', () => {
 
   it('offers six party-size pills mapping to 1 through 6', async () => {
     const user = userEvent.setup();
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
 
@@ -48,16 +48,53 @@ describe('OpeningModule', () => {
   });
 
   it('shows a required-field legend and asterisks on Name and Are you planning on coming?', () => {
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
     expect(screen.getByText('*required')).toBeInTheDocument();
-    expect(screen.getByText('Your name *')).toBeInTheDocument();
+    expect(screen.getByText('NAME *')).toBeInTheDocument();
     expect(screen.getByText('Are you planning on coming? *')).toBeInTheDocument();
   });
 
   it('shows an asterisk on the crew-size question once attending is true', async () => {
     const user = userEvent.setup();
-    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} />);
+    render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
     await user.click(screen.getByRole('button', { name: /i'm in/i }));
     expect(screen.getByText('How many in your crew? *')).toBeInTheDocument();
+  });
+
+  describe('quiz gate', () => {
+    it('shows the quiz overlay after the first character typed in the name field', async () => {
+      const user = userEvent.setup();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={false} onQuizPassed={vi.fn()} />);
+      expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
+      await user.type(screen.getByLabelText(/^name/i), 'S');
+      expect(screen.getByText(/who is this/i)).toBeInTheDocument();
+    });
+
+    it('shows the quiz overlay when either attending pill is clicked', async () => {
+      const user = userEvent.setup();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={false} onQuizPassed={vi.fn()} />);
+      await user.click(screen.getByRole('button', { name: /can't make it/i }));
+      expect(screen.getByText(/who is this/i)).toBeInTheDocument();
+    });
+
+    it('hides the overlay and calls onQuizPassed once the correct answer is picked, without losing the in-progress name', async () => {
+      const user = userEvent.setup();
+      const onQuizPassed = vi.fn();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={false} onQuizPassed={onQuizPassed} />);
+      const name = screen.getByLabelText(/^name/i);
+      await user.type(name, 'S');
+      await user.click(screen.getByRole('button', { name: 'Kiku' }));
+      expect(onQuizPassed).toHaveBeenCalled();
+      expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
+      expect(name).toHaveValue('S');
+    });
+
+    it('never shows the overlay when quizPassed is already true', async () => {
+      const user = userEvent.setup();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={true} onQuizPassed={vi.fn()} />);
+      await user.type(screen.getByLabelText(/^name/i), 'Steve');
+      await user.click(screen.getByRole('button', { name: /i'm in/i }));
+      expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
+    });
   });
 });

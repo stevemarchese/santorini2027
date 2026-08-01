@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
+import QuizGate from '@/components/QuizGate';
 import { canAdvanceFromOpening } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
 
@@ -16,79 +17,105 @@ const PARTY_SIZE_OPTIONS: { value: number; label: string }[] = [
 interface OpeningModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
+  quizPassed: boolean;
+  onQuizPassed: () => void;
 }
 
-export default function OpeningModule({ draft, onAdvance }: OpeningModuleProps) {
+export default function OpeningModule({ draft, onAdvance, quizPassed, onQuizPassed }: OpeningModuleProps) {
   const [local, setLocal] = useState(draft);
+  const [showQuiz, setShowQuiz] = useState(false);
+
+  function maybeTriggerQuiz() {
+    if (!quizPassed && !showQuiz) setShowQuiz(true);
+  }
 
   return (
-    <ModulePanel draggable>
-      <h1 className="text-xl font-bold uppercase tracking-wide text-cream">
-        Join us in Santorini
-      </h1>
-      <p className="mt-2 text-xs font-bold uppercase tracking-widest text-cream/70">
-        20 years — 2007 to 2027
-      </p>
-      <label htmlFor="name" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-        Your name *
-      </label>
-      <input
-        id="name"
-        className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
-        value={local.name}
-        onChange={(event) => setLocal({ ...local, name: event.target.value })}
-      />
-      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you planning on coming? *</p>
-      <div className="mt-2 flex gap-3">
-        <button
-          type="button"
-          onClick={() => setLocal({ ...local, attending: true })}
-          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
-            local.attending === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-          }`}
-        >
-          I&apos;m in
-        </button>
-        <button
-          type="button"
-          onClick={() => setLocal({ ...local, attending: false, partySize: null })}
-          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
-            local.attending === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-          }`}
-        >
-          Can&apos;t make it
-        </button>
-      </div>
-      {local.attending === true && (
-        <>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setLocal({ ...local, partySize: value })}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
-                  local.partySize === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
+    <>
+      <ModulePanel draggable>
+        <h1 className="text-xl font-bold uppercase tracking-wide text-cream">
+          Join us in Santorini
+        </h1>
+        <p className="mt-2 text-xs font-bold uppercase tracking-widest text-cream/70">
+          20 years — 2007 to 2027
+        </p>
+        <label htmlFor="name" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
+          NAME *
+        </label>
+        <input
+          id="name"
+          className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
+          value={local.name}
+          onChange={(event) => {
+            maybeTriggerQuiz();
+            setLocal({ ...local, name: event.target.value });
+          }}
+        />
+        <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Are you planning on coming? *</p>
+        <div className="mt-2 flex gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              maybeTriggerQuiz();
+              setLocal({ ...local, attending: true });
+            }}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+              local.attending === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+            }`}
+          >
+            I&apos;m in
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              maybeTriggerQuiz();
+              setLocal({ ...local, attending: false, partySize: null });
+            }}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+              local.attending === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+            }`}
+          >
+            Can&apos;t make it
+          </button>
+        </div>
+        {local.attending === true && (
+          <>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {PARTY_SIZE_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setLocal({ ...local, partySize: value })}
+                  className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide ${
+                    local.partySize === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        <div className="mt-6 flex items-center justify-between">
+          <p className="text-[10px] uppercase tracking-widest text-sage/70">*required</p>
+          <button
+            type="button"
+            onClick={() => onAdvance(local)}
+            disabled={!canAdvanceFromOpening(local)}
+            className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
+          >
+            Next <span className="animate-arrow-bob">→</span>
+          </button>
+        </div>
+      </ModulePanel>
+      {showQuiz && !quizPassed && (
+        <QuizGate
+          onPass={() => {
+            setShowQuiz(false);
+            onQuizPassed();
+          }}
+        />
       )}
-      <div className="mt-6 flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-sage/70">*required</p>
-        <button
-          type="button"
-          onClick={() => onAdvance(local)}
-          disabled={!canAdvanceFromOpening(local)}
-          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
-        >
-          Next <span className="animate-arrow-bob">→</span>
-        </button>
-      </div>
-    </ModulePanel>
+    </>
   );
 }
