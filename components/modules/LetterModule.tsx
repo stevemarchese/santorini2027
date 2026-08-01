@@ -1,6 +1,6 @@
 'use client';
 import ModulePanel from '@/components/ModulePanel';
-import { dirtyline } from '@/lib/fonts';
+import { dirtyline } from '@/lib/dirtyline-font';
 import type { DraftResponse } from '@/lib/types';
 
 interface LetterModuleProps {

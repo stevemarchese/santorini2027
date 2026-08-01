@@ -1,5 +1,5 @@
 'use client';
-import { dirtyline } from '@/lib/fonts';
+import { dirtyline } from '@/lib/dirtyline-font';
 import type { DraftResponse } from '@/lib/types';
 
 interface SplashModuleProps {
@@ -10,13 +10,13 @@ interface SplashModuleProps {
 export default function SplashModule({ draft, onAdvance }: SplashModuleProps) {
   return (
     <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center p-6 text-center">
-      <span className="block overflow-hidden">
+      <div className="overflow-hidden">
         <h1
           className={`${dirtyline.className} animate-splash-title-in text-[clamp(26px,5.5vw,58px)] leading-[1.15] text-cream`}
         >
           SAntOrIni! PaRT DeUx
         </h1>
-      </span>
+      </div>
       <p
         className={`${dirtyline.className} animate-splash-subtitle-in mt-3 text-[clamp(14px,2.6vw,20px)] tracking-wide text-cream`}
       >

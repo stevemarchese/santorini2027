@@ -179,3 +179,11 @@
 .animate-splash-cta-in {
   animation: splash-cta-pop 0.5s ease-out 1.6s both, splash-cta-bob 2s ease-in-out 2.1s infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-splash-title-in,
+  .animate-splash-subtitle-in,
+  .animate-splash-cta-in {
+    animation: none;
+  }
+}
