@@ -14,8 +14,15 @@ describe('ContentEditor', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
   });
 
-  it('seeds the fields from the passed content', () => {
+  it('defaults to closed, hiding the fields until the summary is clicked', () => {
     render(<ContentEditor content={content} />);
+    expect(screen.queryByLabelText(/^letter$/i)).not.toBeVisible();
+  });
+
+  it('seeds the fields from the passed content once opened', async () => {
+    const user = userEvent.setup();
+    render(<ContentEditor content={content} />);
+    await user.click(screen.getByText(/site content/i));
     expect(screen.getByLabelText(/^letter$/i)).toHaveValue('Hello friend.');
     expect(screen.getByLabelText(/confirmation — attending/i)).toHaveValue('See you in Santorini');
     expect(screen.getByLabelText(/confirmation — not attending/i)).toHaveValue('Thanks for letting us know');
@@ -24,6 +31,7 @@ describe('ContentEditor', () => {
   it('posts edited content to the API and shows a saved state', async () => {
     const user = userEvent.setup();
     render(<ContentEditor content={content} />);
+    await user.click(screen.getByText(/site content/i));
     const letter = screen.getByLabelText(/^letter$/i);
     await user.clear(letter);
     await user.type(letter, 'New letter body');
