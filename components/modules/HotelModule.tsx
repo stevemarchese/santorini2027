@@ -27,7 +27,7 @@ export default function HotelModule({ draft, onAdvance, onBack }: HotelModulePro
 
   return (
     <ModulePanel>
-      <ModuleWaveHeader title="ThE HoTel" subtitle="Where you'll rest your head" titleClassName="text-[24px]" />
+      <ModuleWaveHeader title="ThE fAmily HoTel" subtitle="Nicely Upgraded Since 2007" titleClassName="text-[24px]" />
       <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
         Do you plan on staying at the Adamastos Hotel? *
       </p>

@@ -14,8 +14,8 @@ export interface DraftResponse {
   windowPriority: WindowKey | null;
   travelTiming: 'before' | 'after' | 'both' | 'neither' | null;
   travelNote: string;
-  dinnerInterested: boolean;
-  cruiseInterested: boolean;
+  dinnerInterested: boolean | null;
+  cruiseInterested: boolean | null;
   note: string;
 }
 
@@ -31,7 +31,7 @@ export const EMPTY_DRAFT: DraftResponse = {
   windowPriority: null,
   travelTiming: null,
   travelNote: '',
-  dinnerInterested: false,
-  cruiseInterested: false,
+  dinnerInterested: null,
+  cruiseInterested: null,
   note: '',
 };

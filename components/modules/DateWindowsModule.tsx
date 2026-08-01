@@ -22,12 +22,12 @@ export default function DateWindowsModule({ draft, onAdvance, onBack }: DateWind
 
   return (
     <ModulePanel>
-      <ModuleWaveHeader title="PiCk YouR WeeK" subtitle="Pick what works for you" titleClassName="text-[24px]" />
+      <ModuleWaveHeader title="PicK YouR Week" subtitle="It'll Help us organize some events" titleClassName="text-[24px]" />
       <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">Which week works best for you? *</p>
       <p className="mt-1 text-xs text-sage">Select all that apply — if more than one works, you can flag your favorite below.</p>
       <div className="mt-4 flex flex-col gap-3">
         {WINDOWS.map(({ key, label, field }) => (
-          <div key={key} className="flex items-center gap-3">
+          <div key={key} className="grid grid-cols-[6rem_auto] items-center gap-3">
             <label className="flex items-center gap-2 text-sm text-cream">
               <input
                 type="checkbox"
@@ -40,11 +40,13 @@ export default function DateWindowsModule({ draft, onAdvance, onBack }: DateWind
               <button
                 type="button"
                 onClick={() => setLocal(setWindowPriority(local, key))}
-                className={`text-xs font-bold uppercase tracking-wide ${
-                  local.windowPriority === key ? 'text-terracotta' : 'text-teal'
+                className={`origin-left justify-self-start rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide transition-colors ${
+                  local.windowPriority === key
+                    ? 'bg-terracotta text-cream'
+                    : 'scale-[0.7] bg-cream text-navy hover:bg-cream/80'
                 }`}
               >
-                {local.windowPriority === key ? 'Top pick' : 'Prefer this one'}
+                {local.windowPriority === key ? 'Top pick' : 'Prefer this'}
               </button>
             )}
           </div>

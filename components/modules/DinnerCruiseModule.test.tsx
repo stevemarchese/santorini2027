@@ -5,12 +5,17 @@ import DinnerCruiseModule from './DinnerCruiseModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
 describe('DinnerCruiseModule', () => {
-  it('toggles dinner and cruise interest independently and advances', async () => {
+  it('toggles dinner and cruise interest independently and advances once both are answered', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
     render(<DinnerCruiseModule draft={EMPTY_DRAFT} onAdvance={onAdvance} onBack={vi.fn()} />);
 
-    await user.click(screen.getByLabelText(/group dinner/i));
+    const [dinnerYes] = screen.getAllByRole('button', { name: 'Yes' });
+    await user.click(dinnerYes);
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
+
+    const [, cruiseNo] = screen.getAllByRole('button', { name: 'No' });
+    await user.click(cruiseNo);
     await user.click(screen.getByRole('button', { name: /^next/i }));
 
     expect(onAdvance).toHaveBeenCalledWith(

@@ -15,7 +15,7 @@ const OPTIONS: { value: NonNullable<DraftResponse['travelTiming']>; label: strin
   { value: 'before', label: 'Before' },
   { value: 'after', label: 'After' },
   { value: 'both', label: 'Both' },
-  { value: 'neither', label: 'Neither' },
+  { value: 'neither', label: 'Just Santorini' },
 ];
 
 export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelTimingModuleProps) {
@@ -24,8 +24,8 @@ export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelT
   return (
     <ModulePanel>
       <ModuleWaveHeader
-        title="TraVel PlaNs"
-        subtitle="Before, after, or both?"
+        title="tRaVel plAnS"
+        subtitle="Santorini your first, last or only stop?"
         titleClassName="text-[24px]"
       />
       <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
@@ -37,16 +37,16 @@ export default function TravelTimingModule({ draft, onAdvance, onBack }: TravelT
             key={value}
             type="button"
             onClick={() => setLocal({ ...local, travelTiming: value })}
-            className={`px-5 py-2 text-xs font-bold uppercase tracking-wide ${
-              local.travelTiming === value ? 'bg-terracotta text-cream' : 'border border-teal text-teal'
+            className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wide ${
+              local.travelTiming === value ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
             }`}
           >
             {label}
           </button>
         ))}
       </div>
-      <label htmlFor="travelNote" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
-        Anything else about your plans?
+      <label htmlFor="travelNote" className="mt-8 block text-sm font-semibold uppercase tracking-wide text-sage">
+        Want to share anything else about your plans?
       </label>
       <textarea
         id="travelNote"

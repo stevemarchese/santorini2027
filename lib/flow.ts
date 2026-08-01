@@ -42,6 +42,10 @@ export function canAdvanceFromTravelTiming(draft: DraftResponse): boolean {
   return draft.travelTiming !== null;
 }
 
+export function canAdvanceFromDinnerCruise(draft: DraftResponse): boolean {
+  return draft.dinnerInterested !== null && draft.cruiseInterested !== null;
+}
+
 function windowField(key: WindowKey): 'window1Selected' | 'window2Selected' | 'window3Selected' {
   if (key === 'window_1') return 'window1Selected';
   if (key === 'window_2') return 'window2Selected';

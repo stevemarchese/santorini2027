@@ -48,7 +48,7 @@ export default function ClosingModule({
     <ModulePanel>
       <ModuleWaveHeader
         title={draft.attending ? 'One LaSt ThIng' : 'SorRy To MiSs You'}
-        subtitle={draft.attending ? 'Anything else to add?' : "We'll miss you"}
+        subtitle={draft.attending ? 'The Floor is Yours' : "We'll miss you"}
         titleClassName="text-[24px]"
       />
       <label htmlFor="note" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
