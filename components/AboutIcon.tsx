@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import SignatureLine, { isSignatureParagraph } from '@/components/SignatureLine';
 import { dirtyline } from '@/lib/dirtyline-font';
 
 function LetterGlyph({ className }: { className?: string }) {
@@ -48,16 +49,12 @@ export default function AboutIcon({ visible, paragraphs, onOpenChange }: AboutIc
             >
               ×
             </button>
-            <h1 className={`${dirtyline.className} text-[clamp(16px,4vw,22px)] text-cream`}>
+            <h1 className={`${dirtyline.className} text-[clamp(15px,4vw,18px)] text-cream`}>
               Time flies. let&apos;s have fun.
             </h1>
             {paragraphs.map((paragraph, index) =>
-              paragraph === 'Steve, Andi & Nicolas' ? (
-                <p key={index} className="mt-4 text-[clamp(15px,3.5vw,20px)] text-cream first:mt-0">
-                  <span className={dirtyline.className}>S</span>teve,{' '}
-                  <span className={dirtyline.className}>A</span>ndi &{' '}
-                  <span className={dirtyline.className}>N</span>icolas
-                </p>
+              isSignatureParagraph(paragraph) ? (
+                <SignatureLine key={index} paragraph={paragraph} />
               ) : (
                 <p key={index} className="mt-4 text-sm leading-relaxed text-cream first:mt-0">
                   {paragraph}
