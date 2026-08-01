@@ -36,9 +36,11 @@ describe('HotelModule', () => {
     expect(screen.getByRole('button', { name: '7+' })).toBeInTheDocument();
   });
 
-  it('shows an asterisk on the staying question', () => {
+  it('shows an asterisk on the staying question, with the hotel name linked', () => {
     render(<HotelModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} onBack={vi.fn()} />);
-    expect(screen.getByText('Do you plan on staying at the Adamastos Hotel? *')).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: 'Adamastos Hotel' });
+    expect(link).toHaveAttribute('href', 'https://adamastoshotel.com/en/');
+    expect(link.parentElement?.textContent).toBe('Do you plan on staying at the Adamastos Hotel *');
   });
 
   it('calls onBack when the Back button is clicked', async () => {

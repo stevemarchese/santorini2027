@@ -29,9 +29,29 @@ export default function HotelModule({ draft, onAdvance, onBack }: HotelModulePro
     <ModulePanel>
       <ModuleWaveHeader title="ThE fAmily HoTel" subtitle="Nicely Upgraded Since 2007" titleClassName="text-[24px]" />
       <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
-        Do you plan on staying at the Adamastos Hotel? *
+        Do you plan on staying at the{' '}
+        <a
+          href="https://adamastoshotel.com/en/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-0.5 underline underline-offset-2 hover:text-cream"
+        >
+          Adamastos Hotel
+          <svg
+            viewBox="0 0 24 24"
+            className="h-3 w-3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M7 17 17 7M9 7h8v8" />
+          </svg>
+        </a>
+        {' '}*
       </p>
-      <div className="mt-2 flex gap-3">
+      <div className="mt-4 flex gap-3">
         <button
           type="button"
           onClick={() => setLocal({ ...local, hotelStaying: true })}
