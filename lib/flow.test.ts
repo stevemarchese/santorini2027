@@ -31,6 +31,10 @@ describe('getNextModule — letter', () => {
   it('routes letter unconditionally to opening', () => {
     expect(getNextModule('letter', EMPTY_DRAFT)).toBe('opening');
   });
+
+  it('routes splash unconditionally to letter', () => {
+    expect(getNextModule('splash', EMPTY_DRAFT)).toBe('letter');
+  });
 });
 
 describe('canAdvanceFromOpening', () => {

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Hero from '@/components/Hero';
 import AboutIcon from '@/components/AboutIcon';
 import WeatherWidget from '@/components/WeatherWidget';
+import SplashModule from '@/components/modules/SplashModule';
 import LetterModule from '@/components/modules/LetterModule';
 import OpeningModule from '@/components/modules/OpeningModule';
 import HotelModule from '@/components/modules/HotelModule';
@@ -20,7 +21,7 @@ interface WizardProps {
 }
 
 export default function Wizard({ content }: WizardProps) {
-  const [moduleId, setModuleId] = useState<ModuleId>('letter');
+  const [moduleId, setModuleId] = useState<ModuleId>('splash');
   const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
   const [history, setHistory] = useState<ModuleId[]>([]);
   const [quizPassed, setQuizPassed] = useState(false);
@@ -42,8 +43,9 @@ export default function Wizard({ content }: WizardProps) {
   return (
     <main>
       <Hero />
-      <AboutIcon visible={moduleId !== 'letter'} paragraphs={letterParagraphs} />
+      <AboutIcon visible={moduleId !== 'letter' && moduleId !== 'splash'} paragraphs={letterParagraphs} />
       <WeatherWidget />
+      {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
       {moduleId === 'opening' && (
         <OpeningModule
