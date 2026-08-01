@@ -128,4 +128,21 @@ describe('computeResponsesStats', () => {
     ];
     expect(computeResponsesStats(rows).cruiseGuestCount).toBe(9);
   });
+
+  it('reports zero window selection counts for an empty list', () => {
+    expect(computeResponsesStats([]).windowSelectionCounts).toEqual({ window_1: 0, window_2: 0, window_3: 0 });
+  });
+
+  it('counts a response toward every window it selected, not just one', () => {
+    const rows = [
+      row({ window_1_selected: true, window_2_selected: true, window_3_selected: false }),
+      row({ window_1_selected: false, window_2_selected: true, window_3_selected: true }),
+    ];
+    expect(computeResponsesStats(rows).windowSelectionCounts).toEqual({ window_1: 1, window_2: 2, window_3: 1 });
+  });
+
+  it('does not count a response toward any window when nothing is selected', () => {
+    const rows = [row({ window_1_selected: false, window_2_selected: false, window_3_selected: false })];
+    expect(computeResponsesStats(rows).windowSelectionCounts).toEqual({ window_1: 0, window_2: 0, window_3: 0 });
+  });
 });

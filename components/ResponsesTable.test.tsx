@@ -80,6 +80,23 @@ describe('ResponsesTable', () => {
     expect(nonTopBar?.className).not.toContain('bg-terracotta');
   });
 
+  it('renders the window totals breakdown with per-window selection counts and no highlight', () => {
+    const windowData = [
+      row({ name: 'A', window_1_selected: true, window_2_selected: true }),
+      row({ name: 'B', window_2_selected: true }),
+    ];
+    render(<ResponsesTable responses={windowData} />);
+    const totalsCard = screen.getByTestId('stat-window-totals');
+    expect(within(totalsCard).getByText('6/30-7/6')).toBeInTheDocument();
+    expect(within(totalsCard).getByText('7/7-7/13')).toBeInTheDocument();
+    expect(within(totalsCard).getByText('7/14-7/18')).toBeInTheDocument();
+    expect(within(totalsCard).getByText('1')).toBeInTheDocument();
+    expect(within(totalsCard).getByText('2')).toBeInTheDocument();
+    expect(within(totalsCard).getByText('0')).toBeInTheDocument();
+    const bars = totalsCard.querySelectorAll('[data-bar-key]');
+    bars.forEach((bar) => expect(bar.className).not.toContain('bg-terracotta'));
+  });
+
   it('shows a dash for the average hotel stay when nobody is staying at the hotel', () => {
     const noHotelData = [row({ name: 'A', hotel_staying: false }), row({ name: 'B', hotel_staying: null })];
     render(<ResponsesTable responses={noHotelData} />);

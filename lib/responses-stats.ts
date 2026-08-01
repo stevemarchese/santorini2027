@@ -6,6 +6,7 @@ export interface ResponsesStats {
   avgHotelNights: number | null;
   windowPriorityCounts: { window_1: number; window_2: number; window_3: number };
   topPriorityWindow: 'window_1' | 'window_2' | 'window_3' | null;
+  windowSelectionCounts: { window_1: number; window_2: number; window_3: number };
   dinnerYesCount: number;
   cruiseYesCount: number;
   totalGuests: number;
@@ -37,6 +38,12 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
   const topEntries = entries.filter(([, count]) => count === maxCount);
   const topPriorityWindow = maxCount === 0 || topEntries.length > 1 ? null : topEntries[0][0];
 
+  const windowSelectionCounts = {
+    window_1: rows.filter((r) => r.window_1_selected).length,
+    window_2: rows.filter((r) => r.window_2_selected).length,
+    window_3: rows.filter((r) => r.window_3_selected).length,
+  };
+
   const dinnerYesCount = rows.filter((r) => r.dinner_interested === true).length;
   const cruiseYesCount = rows.filter((r) => r.cruise_interested === true).length;
 
@@ -56,6 +63,7 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
     avgHotelNights,
     windowPriorityCounts,
     topPriorityWindow,
+    windowSelectionCounts,
     dinnerYesCount,
     cruiseYesCount,
     totalGuests,
