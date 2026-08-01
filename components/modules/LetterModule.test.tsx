@@ -5,7 +5,7 @@ import LetterModule from './LetterModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
 describe('LetterModule', () => {
-  it('renders the provided paragraphs and advances the unchanged draft on Next', async () => {
+  it('renders the provided paragraphs and advances the unchanged draft on Give Us Some Info', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
     const paragraphs = ['First paragraph.', 'Last paragraph.'];
@@ -14,7 +14,7 @@ describe('LetterModule', () => {
     expect(screen.getByText('First paragraph.')).toBeInTheDocument();
     expect(screen.getByText('Last paragraph.')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /^next/i }));
+    await user.click(screen.getByRole('button', { name: /give us some info/i }));
     expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
   });
 

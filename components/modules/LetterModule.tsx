@@ -14,7 +14,7 @@ interface LetterModuleProps {
 export default function LetterModule({ draft, paragraphs, onAdvance }: LetterModuleProps) {
   return (
     <ModulePanel draggable wide>
-      <h1 className={`${dirtyline.className} text-[clamp(15px,4vw,18px)] text-cream`}>
+      <h1 className={`${dirtyline.className} text-[clamp(17px,4vw,22px)] text-cream`}>
         Time flies. let&apos;s have fun.
       </h1>
       {paragraphs.map((paragraph, index) =>
@@ -26,8 +26,8 @@ export default function LetterModule({ draft, paragraphs, onAdvance }: LetterMod
           </p>
         )
       )}
-      <div className="mt-6 flex justify-end">
-        <PillButton onClick={() => onAdvance(draft)}>Next</PillButton>
+      <div className="mt-6 flex justify-center">
+        <PillButton onClick={() => onAdvance(draft)}>Give Us Some Info</PillButton>
       </div>
     </ModulePanel>
   );

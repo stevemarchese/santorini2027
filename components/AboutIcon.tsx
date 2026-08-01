@@ -49,7 +49,7 @@ export default function AboutIcon({ visible, paragraphs, onOpenChange }: AboutIc
             >
               ×
             </button>
-            <h1 className={`${dirtyline.className} text-[clamp(15px,4vw,18px)] text-cream`}>
+            <h1 className={`${dirtyline.className} text-[clamp(17px,4vw,22px)] text-cream`}>
               Time flies. let&apos;s have fun.
             </h1>
             {paragraphs.map((paragraph, index) =>

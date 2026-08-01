@@ -49,4 +49,50 @@ describe('QuizGate', () => {
     expect(onPass).not.toHaveBeenCalled();
     expect(screen.getByText(/guess again/i)).toBeInTheDocument();
   });
+
+  it('shows a different retry message for each distinct wrong option, in light blue', async () => {
+    const user = userEvent.setup();
+    render(<QuizGate onPass={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: 'Cookie' }));
+    const first = screen.getByText(/guess again/i);
+    expect(first.className).toContain('text-sky-300');
+
+    await user.click(screen.getByRole('button', { name: 'Marshmallow' }));
+    const second = screen.getByText(/still not it/i);
+    expect(second).toBeInTheDocument();
+    expect(second.className).toContain('text-sky-300');
+
+    await user.click(screen.getByRole('button', { name: 'Cloud Puff' }));
+    expect(screen.getByText(/third time/i)).toBeInTheDocument();
+  });
+
+  it('does not advance the retry message on a repeated click of the same wrong option', async () => {
+    const user = userEvent.setup();
+    render(<QuizGate onPass={vi.fn()} />);
+
+    const cookie = screen.getByRole('button', { name: 'Cookie' });
+    await user.click(cookie);
+    await user.click(cookie);
+    await user.click(cookie);
+
+    expect(screen.getByText(/guess again/i)).toBeInTheDocument();
+  });
+
+  it('darkens each wrong option once picked, leaving untried options cream', async () => {
+    const user = userEvent.setup();
+    render(<QuizGate onPass={vi.fn()} />);
+
+    const cookie = screen.getByRole('button', { name: 'Cookie' });
+    const marshmallow = screen.getByRole('button', { name: 'Marshmallow' });
+    const kiku = screen.getByRole('button', { name: 'Kiku' });
+
+    expect(cookie.className).toContain('bg-cream');
+    await user.click(cookie);
+    expect(cookie.className).not.toContain('bg-cream');
+    expect(cookie.className).toContain('bg-navy/40');
+
+    expect(marshmallow.className).toContain('bg-cream');
+    expect(kiku.className).toContain('bg-cream');
+  });
 });
