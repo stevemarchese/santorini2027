@@ -23,6 +23,7 @@ export default function Wizard({ content }: WizardProps) {
   const [moduleId, setModuleId] = useState<ModuleId>('letter');
   const [draft, setDraft] = useState<DraftResponse>(EMPTY_DRAFT);
   const [history, setHistory] = useState<ModuleId[]>([]);
+  const [quizPassed, setQuizPassed] = useState(false);
 
   const letterParagraphs = splitParagraphs(content.letter);
 
@@ -44,7 +45,14 @@ export default function Wizard({ content }: WizardProps) {
       <AboutIcon visible={moduleId !== 'letter'} paragraphs={letterParagraphs} />
       <WeatherWidget />
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
-      {moduleId === 'opening' && <OpeningModule draft={draft} onAdvance={advance} />}
+      {moduleId === 'opening' && (
+        <OpeningModule
+          draft={draft}
+          onAdvance={advance}
+          quizPassed={quizPassed}
+          onQuizPassed={() => setQuizPassed(true)}
+        />
+      )}
       {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} onBack={goBack} />}
