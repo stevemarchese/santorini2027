@@ -24,7 +24,13 @@ export default function QuizGate({ onPass }: QuizGateProps) {
       <div className="animate-module-in blob-panel relative max-h-dvh w-full max-w-md overflow-y-auto border border-terracotta/40 bg-navy/[0.94] p-10 backdrop-blur-md">
         <p className="text-sm font-semibold uppercase tracking-wide text-sage">Quick check</p>
         <h2 className="mt-1 text-xl font-bold uppercase tracking-wide text-cream">Who is this?</h2>
-        <img src="/kiku.jpg" alt="A fluffy white dog" className="mt-4 w-full rounded object-cover" />
+        <img
+          src="/kiku.jpg"
+          alt="A fluffy white dog"
+          width={525}
+          height={700}
+          className="mt-4 max-h-[40dvh] w-full rounded object-cover"
+        />
         <div className="mt-6 grid grid-cols-2 gap-3">
           {OPTIONS.map((option) => (
             <button

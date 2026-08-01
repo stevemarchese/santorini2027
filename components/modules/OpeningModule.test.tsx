@@ -96,5 +96,21 @@ describe('OpeningModule', () => {
       await user.click(screen.getByRole('button', { name: /i'm in/i }));
       expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
     });
+
+    it('renders the quiz overlay outside the draggable panel so its fixed positioning stays viewport-relative', async () => {
+      const user = userEvent.setup();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={false} onQuizPassed={vi.fn()} />);
+      await user.type(screen.getByLabelText(/^name/i), 'S');
+      const draggablePanel = document.querySelector('[style*="translate"]');
+      expect(draggablePanel).not.toBeNull();
+      expect(draggablePanel!.contains(screen.getByText(/who is this/i))).toBe(false);
+    });
+
+    it("shows the quiz overlay when the I'm in pill is clicked from a fresh state", async () => {
+      const user = userEvent.setup();
+      render(<OpeningModule draft={EMPTY_DRAFT} onAdvance={vi.fn()} quizPassed={false} onQuizPassed={vi.fn()} />);
+      await user.click(screen.getByRole('button', { name: /i'm in/i }));
+      expect(screen.getByText(/who is this/i)).toBeInTheDocument();
+    });
   });
 });

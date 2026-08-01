@@ -46,6 +46,7 @@ export default function OpeningModule({ draft, onAdvance, quizPassed, onQuizPass
           className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
           value={local.name}
           onChange={(event) => {
+            if (!quizPassed && !showQuiz) event.currentTarget.blur();
             maybeTriggerQuiz();
             setLocal({ ...local, name: event.target.value });
           }}

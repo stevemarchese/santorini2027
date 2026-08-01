@@ -37,4 +37,16 @@ describe('QuizGate', () => {
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
     expect(onPass).toHaveBeenCalled();
   });
+
+  it('does not lock out the same wrong option after clicking it once', async () => {
+    const user = userEvent.setup();
+    const onPass = vi.fn();
+    render(<QuizGate onPass={onPass} />);
+    const cookie = screen.getByRole('button', { name: 'Cookie' });
+    await user.click(cookie);
+    expect(cookie).not.toBeDisabled();
+    await user.click(cookie);
+    expect(onPass).not.toHaveBeenCalled();
+    expect(screen.getByText(/guess again/i)).toBeInTheDocument();
+  });
 });
