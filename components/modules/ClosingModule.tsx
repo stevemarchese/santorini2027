@@ -37,9 +37,14 @@ export default function ClosingModule({
   if (status === 'sent') {
     return (
       <ModulePanel>
-        <h2 className="text-xl font-bold uppercase tracking-wide text-cream">
+        <ModuleWaveHeader
+          title={draft.attending ? "You'Re All Set!" : 'We Heard You'}
+          subtitle={draft.attending ? 'Thanks for helping out' : 'Maybe Next Time?'}
+          titleClassName="text-[24px]"
+        />
+        <p className="text-sm leading-relaxed text-cream">
           {draft.attending ? confirmationAttending : confirmationNotAttending}
-        </h2>
+        </p>
       </ModulePanel>
     );
   }

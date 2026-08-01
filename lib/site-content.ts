@@ -9,8 +9,10 @@ export interface SiteContent {
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
   letter: LETTER_PARAGRAPHS.join('\n\n'),
-  confirmationAttending: 'See you in Santorini',
-  confirmationNotAttending: 'Thanks for letting us know',
+  confirmationAttending:
+    "Look out for a lot more specific information in the near future! The answers to these questions will help us out immensely. We are humbled that so many people are already on board. It's gonna be awesome!",
+  confirmationNotAttending:
+    "Thanks for letting us know. We will miss you but totally understand this isn't an easy trip to make. It's 20 years of inflation. Greece is more expensive, we all have families. We'll see each other soon. Promise.",
 };
 
 export function splitParagraphs(text: string): string[] {
