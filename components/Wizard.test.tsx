@@ -9,12 +9,15 @@ describe('Wizard', () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
 
-    expect(screen.getByText('SAntOrIni! PaRT DeUx')).toBeInTheDocument();
+    const splashTitle = (_content: string, element: Element | null) =>
+      element?.tagName.toLowerCase() === 'h1' && element.textContent === 'SAntOrIni! PaRT DeUx';
+
+    expect(screen.getByText(splashTitle)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /give us some info/i })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /tell me more/i }));
 
-    expect(screen.queryByText('SAntOrIni! PaRT DeUx')).not.toBeInTheDocument();
+    expect(screen.queryByText(splashTitle)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /give us some info/i })).toBeInTheDocument();
   });
 

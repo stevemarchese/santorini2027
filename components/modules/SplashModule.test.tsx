@@ -10,7 +10,7 @@ describe('SplashModule', () => {
     const onAdvance = vi.fn();
     render(<SplashModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
 
-    expect(screen.getByText('SAntOrIni! PaRT DeUx')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('SAntOrIni! PaRT DeUx');
     expect(screen.getByText('twenty years in the making')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /tell me more/i }));

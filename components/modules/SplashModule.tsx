@@ -15,13 +15,13 @@ export default function SplashModule({ draft, onAdvance }: SplashModuleProps) {
       <div className="relative z-10 flex flex-col items-center">
         <div className="overflow-hidden">
           <h1
-            className={`${dirtyline.className} animate-splash-title-in text-[clamp(32px,9vw,100px)] leading-[1.15] text-cream`}
+            className={`${dirtyline.className} animate-splash-title-in text-[clamp(50px,9vw,100px)] sm:text-[clamp(32px,9vw,100px)] leading-[1.15] text-cream`}
           >
-            SAntOrIni! PaRT DeUx
+            SAntOrIni!<br className="sm:hidden" /><span className="hidden sm:inline"> </span>PaRT DeUx
           </h1>
         </div>
         <p
-          className={`${dirtyline.className} animate-splash-subtitle-in mt-3 text-[clamp(14px,2.6vw,20px)] tracking-wide text-cream`}
+          className={`${dirtyline.className} animate-splash-subtitle-in mt-3 text-[clamp(22px,2.6vw,20px)] sm:text-[clamp(14px,2.6vw,20px)] tracking-wide text-cream`}
         >
           twenty years in the making
         </p>
