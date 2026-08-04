@@ -21,25 +21,22 @@ describe('Wizard', () => {
     expect(screen.getByRole('button', { name: /give us some info/i })).toBeInTheDocument();
   });
 
-  it('does not re-show the quiz gate after passing it once and navigating back to Opening', async () => {
+  it('does not re-show the quiz gate after passing it once and navigating back to Window', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
 
     await user.click(screen.getByRole('button', { name: /tell me more/i }));
     await user.click(screen.getByRole('button', { name: /give us some info/i }));
 
-    await user.type(screen.getByLabelText(/^name/i), 'S');
+    await user.click(screen.getByRole('button', { name: /tell me more/i }));
     expect(screen.getByText(/who is this/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
     expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /i'm in/i }));
-    await user.click(screen.getByRole('button', { name: 'Just me' }));
     await user.click(screen.getByRole('button', { name: /^next/i }));
-
     await user.click(screen.getByRole('button', { name: /back/i }));
 
-    await user.type(screen.getByLabelText(/^name/i), 'teve');
+    await user.click(screen.getByRole('button', { name: /tell me more/i }));
     expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
   });
 });

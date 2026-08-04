@@ -5,7 +5,8 @@ import AboutIcon from '@/components/AboutIcon';
 import WeatherWidget from '@/components/WeatherWidget';
 import SplashModule from '@/components/modules/SplashModule';
 import LetterModule from '@/components/modules/LetterModule';
-import OpeningModule from '@/components/modules/OpeningModule';
+import WindowModule from '@/components/modules/WindowModule';
+import NameCrewModule from '@/components/modules/NameCrewModule';
 import HotelModule from '@/components/modules/HotelModule';
 import DateWindowsModule from '@/components/modules/DateWindowsModule';
 import TravelTimingModule from '@/components/modules/TravelTimingModule';
@@ -54,16 +55,17 @@ export default function Wizard({ content }: WizardProps) {
       <WeatherWidget variant={weatherOverlapsPanel ? 'cream' : 'terracotta'} />
       {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
-      {moduleId === 'opening' && (
-        <OpeningModule
+      {moduleId === 'window' && (
+        <WindowModule
           draft={draft}
           onAdvance={advance}
           quizPassed={quizPassed}
           onQuizPassed={() => setQuizPassed(true)}
         />
       )}
-      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'nameCrew' && <NameCrewModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'dinnerCruise' && <DinnerCruiseModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'closing' && (

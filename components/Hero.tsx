@@ -18,7 +18,7 @@ export default function Hero() {
 
   return (
     <div className="hero-stage">
-      <div className={`hero-stage-surface${showMotion ? ' animate-hero-breathe' : ''}`}>
+      <div className="hero-stage-surface">
         <video
           ref={videoRef}
           className="h-full w-full object-cover"

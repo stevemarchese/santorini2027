@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   getNextModule,
-  canAdvanceFromOpening,
+  canAdvanceFromWindow,
+  canAdvanceFromNameCrew,
   canAdvanceFromHotel,
   canAdvanceFromDateWindows,
   canAdvanceFromTravelTiming,
@@ -11,25 +12,30 @@ import {
 import { EMPTY_DRAFT } from './types';
 
 describe('getNextModule', () => {
-  it('routes attending=true from opening to hotel', () => {
-    expect(getNextModule('opening', { ...EMPTY_DRAFT, attending: true })).toBe('hotel');
+  it('routes attending=true from window to dateWindows', () => {
+    expect(getNextModule('window', { ...EMPTY_DRAFT, attending: true })).toBe('dateWindows');
   });
 
-  it('routes attending=false from opening straight to closing', () => {
-    expect(getNextModule('opening', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
+  it('routes attending=false from window straight to nameCrew', () => {
+    expect(getNextModule('window', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
+  });
+
+  it('routes attending=true from nameCrew to hotel, attending=false straight to closing', () => {
+    expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: true })).toBe('hotel');
+    expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
   });
 
   it('walks the full attending path in order', () => {
-    expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('dateWindows');
-    expect(getNextModule('dateWindows', EMPTY_DRAFT)).toBe('travelTiming');
+    expect(getNextModule('dateWindows', EMPTY_DRAFT)).toBe('nameCrew');
+    expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('travelTiming');
     expect(getNextModule('travelTiming', EMPTY_DRAFT)).toBe('dinnerCruise');
     expect(getNextModule('dinnerCruise', EMPTY_DRAFT)).toBe('closing');
   });
 });
 
 describe('getNextModule — letter', () => {
-  it('routes letter unconditionally to opening', () => {
-    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('opening');
+  it('routes letter unconditionally to window', () => {
+    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('window');
   });
 
   it('routes splash unconditionally to letter', () => {
@@ -37,16 +43,24 @@ describe('getNextModule — letter', () => {
   });
 });
 
-describe('canAdvanceFromOpening', () => {
-  it('requires a name and an attending answer', () => {
-    expect(canAdvanceFromOpening(EMPTY_DRAFT)).toBe(false);
-    expect(canAdvanceFromOpening({ ...EMPTY_DRAFT, name: 'Steve', attending: false })).toBe(true);
+describe('canAdvanceFromWindow', () => {
+  it('requires an attending answer', () => {
+    expect(canAdvanceFromWindow(EMPTY_DRAFT)).toBe(false);
+    expect(canAdvanceFromWindow({ ...EMPTY_DRAFT, attending: true })).toBe(true);
+    expect(canAdvanceFromWindow({ ...EMPTY_DRAFT, attending: false })).toBe(true);
+  });
+});
+
+describe('canAdvanceFromNameCrew', () => {
+  it('requires a name', () => {
+    expect(canAdvanceFromNameCrew(EMPTY_DRAFT)).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: false })).toBe(true);
   });
 
   it('requires party size when attending', () => {
-    expect(canAdvanceFromOpening({ ...EMPTY_DRAFT, name: 'Steve', attending: true })).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: true })).toBe(false);
     expect(
-      canAdvanceFromOpening({ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 })
+      canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 })
     ).toBe(true);
   });
 });

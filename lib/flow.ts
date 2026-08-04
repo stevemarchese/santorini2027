@@ -5,12 +5,14 @@ export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId
     case 'splash':
       return 'letter';
     case 'letter':
-      return 'opening';
-    case 'opening':
+      return 'window';
+    case 'window':
+      return draft.attending ? 'dateWindows' : 'nameCrew';
+    case 'dateWindows':
+      return 'nameCrew';
+    case 'nameCrew':
       return draft.attending ? 'hotel' : 'closing';
     case 'hotel':
-      return 'dateWindows';
-    case 'dateWindows':
       return 'travelTiming';
     case 'travelTiming':
       return 'dinnerCruise';
@@ -21,9 +23,12 @@ export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId
   }
 }
 
-export function canAdvanceFromOpening(draft: DraftResponse): boolean {
+export function canAdvanceFromWindow(draft: DraftResponse): boolean {
+  return draft.attending !== null;
+}
+
+export function canAdvanceFromNameCrew(draft: DraftResponse): boolean {
   if (!draft.name.trim()) return false;
-  if (draft.attending === null) return false;
   if (draft.attending === true && (draft.partySize === null || draft.partySize < 1)) return false;
   return true;
 }

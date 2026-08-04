@@ -149,15 +149,6 @@
   min-width: 177.78vh; /* 100vh * (16/9) */
 }
 
-@keyframes hero-breathe {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.035); }
-}
-
-.animate-hero-breathe {
-  animation: hero-breathe 12s ease-in-out infinite;
-}
-
 @keyframes splash-title-in {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
