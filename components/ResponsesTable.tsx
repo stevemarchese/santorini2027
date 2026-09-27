@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import type { AdminResponse } from '@/lib/payload';
+import type { AdminResponse, ResponsePhase } from '@/lib/payload';
+import { TRIP_END, TRIP_START, formatShortDate } from '@/lib/trip-dates';
 import { sortResponses, type SortKey, type SortDirection } from '@/lib/responses-sort';
 import { buildResponsesCsv } from '@/lib/responses-export';
 import { computeResponsesStats } from '@/lib/responses-stats';
@@ -10,7 +11,9 @@ interface ResponsesTableProps {
   responses: AdminResponse[];
 }
 
-const COLUMNS: { key: SortKey | null; label: string; srOnly?: boolean }[] = [
+type Column = { key: SortKey | null; label: string; srOnly?: boolean };
+
+const INTEREST_COLUMNS: Column[] = [
   { key: 'created_at', label: 'Submitted' },
   { key: 'name', label: 'Name' },
   { key: 'attending', label: 'Attending' },
@@ -22,6 +25,19 @@ const COLUMNS: { key: SortKey | null; label: string; srOnly?: boolean }[] = [
   { key: null, label: 'Travel Note' },
   { key: 'dinner_interested', label: 'Dinner' },
   { key: 'cruise_interested', label: 'Cruise' },
+  { key: null, label: 'Note' },
+  { key: null, label: 'Actions', srOnly: true },
+];
+
+const CONFIRM_COLUMNS: Column[] = [
+  { key: 'created_at', label: 'Submitted' },
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'attending', label: 'Attending' },
+  { key: 'party_size', label: 'Crew' },
+  { key: null, label: 'Hotel' },
+  { key: 'arrival_date', label: 'Arrive' },
+  { key: null, label: 'Depart' },
   { key: null, label: 'Note' },
   { key: null, label: 'Actions', srOnly: true },
 ];
@@ -40,10 +56,21 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
   const cancelingEditRef = useRef(false);
   const editingIdRef = useRef<string | null>(null);
 
-  const sorted = sortResponses(items, sortKey, sortDir);
-  const stats = computeResponsesStats(items);
+  const [phase, setPhase] = useState<ResponsePhase>('confirm');
+  const visible = items.filter((r) => r.phase === phase);
+  const columns = phase === 'confirm' ? CONFIRM_COLUMNS : INTEREST_COLUMNS;
+  const sorted = sortResponses(visible, sortKey, sortDir);
+  const stats = computeResponsesStats(visible);
+  const nightsMax = Math.max(1, ...stats.hotelGuestsByNight.map((n) => n.guests));
   const windowPriorityMaxCount = Math.max(...WINDOW_KEYS.map((key) => stats.windowPriorityCounts[key]));
   const windowSelectionMaxCount = Math.max(...WINDOW_KEYS.map((key) => stats.windowSelectionCounts[key]));
+
+  function switchPhase(next: ResponsePhase) {
+    setPhase(next);
+    setSortKey('created_at');
+    setSortDir('desc');
+    setActionError(null);
+  }
 
   function handleSort(key: SortKey) {
     setActionError(null);
@@ -57,12 +84,12 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   function handleDownload() {
     setActionError(null);
-    const csv = buildResponsesCsv(items);
+    const csv = buildResponsesCsv(visible, phase);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `santorini-rsvps-${new Date().toISOString().slice(0, 10)}.csv`;
+    anchor.download = phase === 'confirm' ? 'santorini2027-confirmed.csv' : 'santorini2027-interest.csv';
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -137,6 +164,60 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
 
   return (
     <div>
+      <div className="mb-4 flex gap-2">
+        {(['confirm', 'interest'] as ResponsePhase[]).map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => switchPhase(p)}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+              phase === p ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+            }`}
+          >
+            {p === 'confirm' ? 'Confirmed' : 'Interest'}
+          </button>
+        ))}
+      </div>
+
+      {phase === 'confirm' && (
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div data-testid="stat-confirmed" className="rounded-md border border-cream/25 p-3">
+            <div className="text-xs uppercase tracking-wide text-sage">Confirmed</div>
+            <div className="text-2xl font-bold text-cream">{stats.totalGuests} guests</div>
+            <div className="text-xs text-sage">
+              {stats.totalAttending}/{stats.totalResponses} households
+            </div>
+          </div>
+          <div data-testid="stat-hotel-households" className="rounded-md border border-cream/25 p-3">
+            <div className="text-xs uppercase tracking-wide text-sage">At Adamastos</div>
+            <div className="text-2xl font-bold text-cream">{stats.hotelHouseholds}</div>
+            <div className="text-xs text-sage">households</div>
+          </div>
+          <div data-testid="stat-hotel-nights" className="rounded-md border border-cream/25 p-3 md:col-span-3">
+            <div className="mb-2 text-xs uppercase tracking-wide text-sage">Hotel guests by night</div>
+            <div className="flex items-end gap-1">
+              {stats.hotelGuestsByNight.map(({ night, guests }) => {
+                const inWeek = night >= TRIP_START && night < TRIP_END;
+                return (
+                  <div key={night} className="flex flex-1 flex-col items-center gap-1">
+                    <span className="text-[10px] text-cream">{guests}</span>
+                    <div className="flex h-16 w-full items-end overflow-hidden rounded bg-cream/10">
+                      <div
+                        data-night={night}
+                        className={inWeek ? 'w-full bg-terracotta' : 'w-full bg-cream/30'}
+                        style={{ height: `${(guests / nightsMax) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-sage">{formatShortDate(night).split(' ')[1]}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {phase === 'interest' && (
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
         <div data-testid="stat-attending" className="rounded-md border border-cream/25 p-3">
           <div className="text-xs uppercase tracking-wide text-sage">Attending</div>
@@ -192,10 +273,11 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
           </div>
         </div>
       </div>
+      )}
 
       <div className="mb-4 flex items-center justify-between">
         <span className="text-sm text-sage">
-          {items.length} response{items.length === 1 ? '' : 's'}
+          {visible.length} response{visible.length === 1 ? '' : 's'}
         </span>
         <button
           type="button"
@@ -211,7 +293,7 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
       <table className="w-full border-collapse text-sm text-cream">
         <thead>
           <tr className="border-b border-cream/35 text-left uppercase text-sage">
-            {COLUMNS.map((col) => (
+            {columns.map((col) => (
               <th key={col.label} className="p-2">
                 {col.key ? (
                   <button
@@ -276,22 +358,36 @@ export default function ResponsesTable({ responses }: ResponsesTableProps) {
                   </span>
                 )}
               </td>
-              <td className="p-2">{row.attending ? 'Yes' : 'No'}</td>
-              <td className="p-2">{row.party_size ?? '—'}</td>
-              <td className="p-2">
-                {row.hotel_staying ? `Yes, ${row.hotel_nights}n` : row.hotel_staying === false ? 'No' : '—'}
-              </td>
-              <td className="p-2">
-                {[row.window_1_selected && '6/30-7/6', row.window_2_selected && '7/7-7/13', row.window_3_selected && '7/14-7/18']
-                  .filter(Boolean)
-                  .join(', ') || '—'}
-              </td>
-              <td className="p-2">{row.window_priority ?? '—'}</td>
-              <td className="p-2">{row.travel_timing ?? '—'}</td>
-              <td className="p-2">{row.travel_note ?? '—'}</td>
-              <td className="p-2">{row.dinner_interested ? 'Yes' : '—'}</td>
-              <td className="p-2">{row.cruise_interested ? 'Yes' : '—'}</td>
-              <td className="p-2">{row.note ?? '—'}</td>
+              {phase === 'confirm' ? (
+                <>
+                  <td className="p-2">{row.email ?? '—'}</td>
+                  <td className="p-2">{row.attending ? 'Yes' : 'No'}</td>
+                  <td className="p-2">{row.party_size ?? '—'}</td>
+                  <td className="p-2">{row.hotel_staying ? 'Yes' : row.hotel_staying === false ? 'No' : '—'}</td>
+                  <td className="p-2">{row.arrival_date ? formatShortDate(row.arrival_date) : '—'}</td>
+                  <td className="p-2">{row.departure_date ? formatShortDate(row.departure_date) : '—'}</td>
+                  <td className="p-2">{row.note ?? '—'}</td>
+                </>
+              ) : (
+                <>
+                  <td className="p-2">{row.attending ? 'Yes' : 'No'}</td>
+                  <td className="p-2">{row.party_size ?? '—'}</td>
+                  <td className="p-2">
+                    {row.hotel_staying ? `Yes, ${row.hotel_nights}n` : row.hotel_staying === false ? 'No' : '—'}
+                  </td>
+                  <td className="p-2">
+                    {[row.window_1_selected && '6/30-7/6', row.window_2_selected && '7/7-7/13', row.window_3_selected && '7/14-7/18']
+                      .filter(Boolean)
+                      .join(', ') || '—'}
+                  </td>
+                  <td className="p-2">{row.window_priority ?? '—'}</td>
+                  <td className="p-2">{row.travel_timing ?? '—'}</td>
+                  <td className="p-2">{row.travel_note ?? '—'}</td>
+                  <td className="p-2">{row.dinner_interested ? 'Yes' : '—'}</td>
+                  <td className="p-2">{row.cruise_interested ? 'Yes' : '—'}</td>
+                  <td className="p-2">{row.note ?? '—'}</td>
+                </>
+              )}
               <td className="p-2">
                 <button
                   type="button"

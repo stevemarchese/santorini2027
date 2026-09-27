@@ -9,6 +9,10 @@ function bodyNames(): (string | null)[] {
   return rows.map((r) => within(r).getAllByRole('cell')[1].textContent);
 }
 
+async function showInterest(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /^interest/i }));
+}
+
 describe('ResponsesTable', () => {
   const data = [row({ name: 'Charlie' }), row({ name: 'Alice' }), row({ name: 'Bob' })];
 
@@ -26,26 +30,30 @@ describe('ResponsesTable', () => {
     expect(screen.getByRole('button', { name: /download csv/i })).toBeInTheDocument();
   });
 
-  it('renders the summary stats cards with headcount and hotel/dinner/cruise numbers', () => {
+  it('renders the summary stats cards with headcount and hotel/dinner/cruise numbers', async () => {
+    const user = userEvent.setup();
     const statsData = [
-      row({ name: 'A', attending: true, party_size: 4, dinner_interested: true, cruise_interested: true }),
-      row({ name: 'B', attending: false, party_size: 2 }),
-      row({ name: 'C', attending: true, party_size: 2, dinner_interested: true, cruise_interested: false }),
+      row({ phase: 'interest', name: 'A', attending: true, party_size: 4, dinner_interested: true, cruise_interested: true }),
+      row({ phase: 'interest', name: 'B', attending: false, party_size: 2 }),
+      row({ phase: 'interest', name: 'C', attending: true, party_size: 2, dinner_interested: true, cruise_interested: false }),
     ];
     render(<ResponsesTable responses={statsData} />);
+    await showInterest(user);
     const attendingCard = screen.getByTestId('stat-attending');
     expect(within(attendingCard).getByText(/6 guests/i)).toBeInTheDocument();
     expect(within(attendingCard).getByText(/2\/3 responses/i)).toBeInTheDocument();
     expect(screen.getByTestId('stat-dinner-cruise')).toHaveTextContent('6 dinner · 4 cruise');
   });
 
-  it('renders the window priority breakdown as bars with per-window counts and highlights the top window', () => {
+  it('renders the window priority breakdown as bars with per-window counts and highlights the top window', async () => {
+    const user = userEvent.setup();
     const windowData = [
-      row({ name: 'A', window_priority: 'window_2' }),
-      row({ name: 'B', window_priority: 'window_1' }),
-      row({ name: 'C', window_priority: 'window_2' }),
+      row({ phase: 'interest', name: 'A', window_priority: 'window_2' }),
+      row({ phase: 'interest', name: 'B', window_priority: 'window_1' }),
+      row({ phase: 'interest', name: 'C', window_priority: 'window_2' }),
     ];
     render(<ResponsesTable responses={windowData} />);
+    await showInterest(user);
     const priorityCard = screen.getByTestId('stat-window-priority');
     expect(within(priorityCard).getByText('6/30-7/6')).toBeInTheDocument();
     expect(within(priorityCard).getByText('7/7-7/13')).toBeInTheDocument();
@@ -58,12 +66,14 @@ describe('ResponsesTable', () => {
     expect(nonTopBar?.className).not.toContain('bg-terracotta');
   });
 
-  it('renders the window totals breakdown with per-window selection counts and no highlight', () => {
+  it('renders the window totals breakdown with per-window selection counts and no highlight', async () => {
+    const user = userEvent.setup();
     const windowData = [
-      row({ name: 'A', window_1_selected: true, window_2_selected: true }),
-      row({ name: 'B', window_2_selected: true }),
+      row({ phase: 'interest', name: 'A', window_1_selected: true, window_2_selected: true }),
+      row({ phase: 'interest', name: 'B', window_2_selected: true }),
     ];
     render(<ResponsesTable responses={windowData} />);
+    await showInterest(user);
     const totalsCard = screen.getByTestId('stat-window-totals');
     expect(within(totalsCard).getByText('6/30-7/6')).toBeInTheDocument();
     expect(within(totalsCard).getByText('7/7-7/13')).toBeInTheDocument();
@@ -75,9 +85,11 @@ describe('ResponsesTable', () => {
     bars.forEach((bar) => expect(bar.className).not.toContain('bg-terracotta'));
   });
 
-  it('shows a dash for the average hotel stay when nobody is staying at the hotel', () => {
-    const noHotelData = [row({ name: 'A', hotel_staying: false }), row({ name: 'B', hotel_staying: null })];
+  it('shows a dash for the average hotel stay when nobody is staying at the hotel', async () => {
+    const user = userEvent.setup();
+    const noHotelData = [row({ phase: 'interest', name: 'A', hotel_staying: false }), row({ phase: 'interest', name: 'B', hotel_staying: null })];
     render(<ResponsesTable responses={noHotelData} />);
+    await showInterest(user);
     expect(within(screen.getByTestId('stat-hotel')).getByText('—')).toBeInTheDocument();
   });
 
@@ -270,6 +282,63 @@ describe('ResponsesTable', () => {
         expect.objectContaining({ method: 'PATCH' })
       );
       expect(await screen.findByText('Alicia')).toBeInTheDocument();
+    });
+  });
+
+  describe('phase tabs', () => {
+    const mixed = [
+      row({ name: 'Legacy', phase: 'interest', window_priority: 'window_1' }),
+      row({ name: 'Fresh', phase: 'confirm', email: 'fresh@example.com', party_size: 2, hotel_staying: true, arrival_date: '2027-06-30', departure_date: '2027-07-06' }),
+    ];
+
+    it('shows only confirmed rows by default and hides interest rows', () => {
+      render(<ResponsesTable responses={mixed} />);
+      expect(screen.getByText('Fresh')).toBeInTheDocument();
+      expect(screen.queryByText('Legacy')).not.toBeInTheDocument();
+      expect(screen.getByText(/^1 response$/i)).toBeInTheDocument();
+    });
+
+    it('switches to interest rows and legacy columns on the Interest tab', async () => {
+      const user = userEvent.setup();
+      render(<ResponsesTable responses={mixed} />);
+      await user.click(screen.getByRole('button', { name: /^interest/i }));
+      expect(screen.getByText('Legacy')).toBeInTheDocument();
+      expect(screen.queryByText('Fresh')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /priority/i })).toBeInTheDocument();
+    });
+
+    it('renders confirmed columns with email and short dates', () => {
+      render(<ResponsesTable responses={mixed} />);
+      expect(screen.getByRole('button', { name: /^email/i })).toBeInTheDocument();
+      expect(screen.getByText('fresh@example.com')).toBeInTheDocument();
+      expect(screen.getByText('Jun 30')).toBeInTheDocument();
+      expect(screen.getByText('Jul 6')).toBeInTheDocument();
+    });
+
+    it('renders confirmed stat cards and the hotel-by-night strip', () => {
+      render(<ResponsesTable responses={mixed} />);
+      expect(screen.getByTestId('stat-confirmed')).toHaveTextContent('2 guests');
+      expect(screen.getByTestId('stat-confirmed')).toHaveTextContent('1/1 households');
+      expect(screen.getByTestId('stat-hotel-households')).toHaveTextContent('1');
+      const strip = screen.getByTestId('stat-hotel-nights');
+      const bar = strip.querySelector('[data-night="2027-06-30"]');
+      expect(bar?.className).toContain('bg-terracotta');
+      expect(strip.querySelector('[data-night="2027-06-27"]')?.className).not.toContain('bg-terracotta');
+    });
+
+    it('names the CSV download by phase', async () => {
+      const user = userEvent.setup();
+      const clicks: string[] = [];
+      vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+        clicks.push(this.download);
+      });
+      URL.createObjectURL = () => 'blob:x';
+      URL.revokeObjectURL = () => {};
+      render(<ResponsesTable responses={mixed} />);
+      await user.click(screen.getByRole('button', { name: /download csv/i }));
+      await user.click(screen.getByRole('button', { name: /^interest/i }));
+      await user.click(screen.getByRole('button', { name: /download csv/i }));
+      expect(clicks).toEqual(['santorini2027-confirmed.csv', 'santorini2027-interest.csv']);
     });
   });
 });
