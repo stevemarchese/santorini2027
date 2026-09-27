@@ -124,3 +124,46 @@ describe('computeResponsesStats', () => {
     expect(computeResponsesStats(rows).windowSelectionCounts).toEqual({ window_1: 0, window_2: 0, window_3: 0 });
   });
 });
+
+describe('confirmed-phase stats', () => {
+  it('counts hotel households among attending rows only', () => {
+    const rows = [
+      row({ attending: true, hotel_staying: true, arrival_date: '2027-06-30', departure_date: '2027-07-06' }),
+      row({ attending: true, hotel_staying: false }),
+      row({ attending: false, hotel_staying: true, arrival_date: '2027-06-30', departure_date: '2027-07-06' }),
+    ];
+    expect(computeResponsesStats(rows).hotelHouseholds).toBe(1);
+  });
+
+  it('lists every night in the allowed stay range, in order, even with no rows', () => {
+    const nights = computeResponsesStats([]).hotelGuestsByNight;
+    expect(nights).toHaveLength(16);
+    expect(nights[0]).toEqual({ night: '2027-06-26', guests: 0 });
+    expect(nights[15]).toEqual({ night: '2027-07-11', guests: 0 });
+  });
+
+  it('sums party sizes for each night a household is in the hotel, excluding departure day', () => {
+    const rows = [
+      row({ attending: true, party_size: 2, hotel_staying: true, arrival_date: '2027-06-30', departure_date: '2027-07-02' }),
+      row({ attending: true, party_size: 3, hotel_staying: true, arrival_date: '2027-07-01', departure_date: '2027-07-04' }),
+      row({ attending: true, party_size: 9, hotel_staying: false }),
+      row({ attending: false, party_size: 9, hotel_staying: true, arrival_date: '2027-06-30', departure_date: '2027-07-06' }),
+    ];
+    const byNight = Object.fromEntries(computeResponsesStats(rows).hotelGuestsByNight.map((n) => [n.night, n.guests]));
+    expect(byNight['2027-06-29']).toBe(0);
+    expect(byNight['2027-06-30']).toBe(2);
+    expect(byNight['2027-07-01']).toBe(5);
+    expect(byNight['2027-07-02']).toBe(3);
+    expect(byNight['2027-07-03']).toBe(3);
+    expect(byNight['2027-07-04']).toBe(0);
+  });
+
+  it('clips a stay that spans the whole range and ignores rows with missing dates', () => {
+    const rows = [
+      row({ attending: true, party_size: 1, hotel_staying: true, arrival_date: '2027-06-26', departure_date: '2027-07-12' }),
+      row({ attending: true, party_size: 4, hotel_staying: true, arrival_date: null, departure_date: null }),
+    ];
+    const nights = computeResponsesStats(rows).hotelGuestsByNight;
+    expect(nights.every((n) => n.guests === 1)).toBe(true);
+  });
+});

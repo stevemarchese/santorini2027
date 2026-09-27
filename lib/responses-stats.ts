@@ -1,4 +1,5 @@
 import type { AdminResponse } from './payload';
+import { STAY_MAX, STAY_MIN, eachNight } from './trip-dates';
 
 export interface ResponsesStats {
   totalResponses: number;
@@ -12,6 +13,8 @@ export interface ResponsesStats {
   totalGuests: number;
   dinnerGuestCount: number;
   cruiseGuestCount: number;
+  hotelHouseholds: number;
+  hotelGuestsByNight: { night: string; guests: number }[];
 }
 
 export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
@@ -57,6 +60,17 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
     .filter((r) => r.cruise_interested === true)
     .reduce((sum, r) => sum + (r.party_size ?? 0), 0);
 
+  const hotelRows = rows.filter((r) => r.attending === true && r.hotel_staying === true);
+  const hotelHouseholds = hotelRows.length;
+  const hotelGuestsByNight = eachNight(STAY_MIN, STAY_MAX).map((night) => ({
+    night,
+    guests: hotelRows
+      .filter(
+        (r) => r.arrival_date != null && r.departure_date != null && r.arrival_date <= night && night < r.departure_date
+      )
+      .reduce((sum, r) => sum + (r.party_size ?? 0), 0),
+  }));
+
   return {
     totalResponses,
     totalAttending,
@@ -69,5 +83,7 @@ export function computeResponsesStats(rows: AdminResponse[]): ResponsesStats {
     totalGuests,
     dinnerGuestCount,
     cruiseGuestCount,
+    hotelHouseholds,
+    hotelGuestsByNight,
   };
 }
