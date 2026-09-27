@@ -1,134 +1,56 @@
 import { describe, it, expect } from 'vitest';
-import {
-  getNextModule,
-  canAdvanceFromWindow,
-  canAdvanceFromNameCrew,
-  canAdvanceFromHotel,
-  canAdvanceFromDateWindows,
-  canAdvanceFromTravelTiming,
-  toggleWindow,
-  setWindowPriority,
-} from './flow';
+import { getNextModule, canAdvanceFromInOut, canAdvanceFromNameCrew, canAdvanceFromHotel } from './flow';
 import { EMPTY_DRAFT } from './types';
 
 describe('getNextModule', () => {
-  it('routes attending=true from window to dateWindows', () => {
-    expect(getNextModule('window', { ...EMPTY_DRAFT, attending: true })).toBe('dateWindows');
+  it('walks splash → letter → inOut → nameCrew unconditionally', () => {
+    expect(getNextModule('splash', EMPTY_DRAFT)).toBe('letter');
+    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('inOut');
+    expect(getNextModule('inOut', { ...EMPTY_DRAFT, attending: true })).toBe('nameCrew');
+    expect(getNextModule('inOut', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
   });
 
-  it('routes attending=false from window straight to nameCrew', () => {
-    expect(getNextModule('window', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
-  });
-
-  it('routes attending=true from nameCrew to hotel, attending=false straight to closing', () => {
+  it('routes attending guests through hotel and others straight to closing', () => {
     expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: true })).toBe('hotel');
     expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
-  });
-
-  it('walks the full attending path in order', () => {
-    expect(getNextModule('dateWindows', EMPTY_DRAFT)).toBe('nameCrew');
-    expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('travelTiming');
-    expect(getNextModule('travelTiming', EMPTY_DRAFT)).toBe('dinnerCruise');
-    expect(getNextModule('dinnerCruise', EMPTY_DRAFT)).toBe('closing');
+    expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('closing');
+    expect(getNextModule('closing', EMPTY_DRAFT)).toBe('closing');
   });
 });
 
-describe('getNextModule — letter', () => {
-  it('routes letter unconditionally to window', () => {
-    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('window');
-  });
-
-  it('routes splash unconditionally to letter', () => {
-    expect(getNextModule('splash', EMPTY_DRAFT)).toBe('letter');
-  });
-});
-
-describe('canAdvanceFromWindow', () => {
+describe('canAdvanceFromInOut', () => {
   it('requires an attending answer', () => {
-    expect(canAdvanceFromWindow(EMPTY_DRAFT)).toBe(false);
-    expect(canAdvanceFromWindow({ ...EMPTY_DRAFT, attending: true })).toBe(true);
-    expect(canAdvanceFromWindow({ ...EMPTY_DRAFT, attending: false })).toBe(true);
+    expect(canAdvanceFromInOut(EMPTY_DRAFT)).toBe(false);
+    expect(canAdvanceFromInOut({ ...EMPTY_DRAFT, attending: true })).toBe(true);
+    expect(canAdvanceFromInOut({ ...EMPTY_DRAFT, attending: false })).toBe(true);
   });
 });
 
 describe('canAdvanceFromNameCrew', () => {
-  it('requires a name', () => {
-    expect(canAdvanceFromNameCrew(EMPTY_DRAFT)).toBe(false);
+  it('requires only a name when not attending', () => {
+    expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, attending: false })).toBe(false);
     expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: false })).toBe(true);
   });
 
-  it('requires party size when attending', () => {
-    expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: true })).toBe(false);
-    expect(
-      canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: true, partySize: 2 })
-    ).toBe(true);
+  it('requires name, party size and a valid email when attending', () => {
+    const base = { ...EMPTY_DRAFT, attending: true, name: 'Steve' };
+    expect(canAdvanceFromNameCrew(base)).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...base, partySize: 2 })).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...base, partySize: 2, email: 'nope' })).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...base, partySize: 2, email: 'steve@example.com' })).toBe(true);
   });
 });
 
 describe('canAdvanceFromHotel', () => {
-  it('requires nights only when staying', () => {
+  it('requires an answer, and valid ordered dates only when staying', () => {
+    expect(canAdvanceFromHotel(EMPTY_DRAFT)).toBe(false);
     expect(canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: false })).toBe(true);
     expect(canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: true })).toBe(false);
-    expect(canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: true, hotelNights: 3 })).toBe(true);
-  });
-});
-
-describe('canAdvanceFromDateWindows', () => {
-  it('requires at least one window selected', () => {
-    expect(canAdvanceFromDateWindows(EMPTY_DRAFT)).toBe(false);
-    expect(canAdvanceFromDateWindows({ ...EMPTY_DRAFT, window2Selected: true })).toBe(true);
-  });
-});
-
-describe('canAdvanceFromTravelTiming', () => {
-  it('requires a selection', () => {
-    expect(canAdvanceFromTravelTiming(EMPTY_DRAFT)).toBe(false);
-    expect(canAdvanceFromTravelTiming({ ...EMPTY_DRAFT, travelTiming: 'both' })).toBe(true);
-  });
-});
-
-describe('toggleWindow', () => {
-  it('auto-sets priority when exactly one window is selected', () => {
-    const updated = toggleWindow(EMPTY_DRAFT, 'window_2');
-    expect(updated.window2Selected).toBe(true);
-    expect(updated.windowPriority).toBe('window_2');
-  });
-
-  it('clears priority when its window is deselected', () => {
-    const oneSelected = toggleWindow(EMPTY_DRAFT, 'window_2');
-    const deselected = toggleWindow(oneSelected, 'window_2');
-    expect(deselected.window2Selected).toBe(false);
-    expect(deselected.windowPriority).toBeNull();
-  });
-
-  it('does not overwrite an existing priority when a second window is added', () => {
-    const first = toggleWindow(EMPTY_DRAFT, 'window_1');
-    const second = toggleWindow(first, 'window_3');
-    expect(second.windowPriority).toBe('window_1');
-  });
-
-  it('reassigns priority to the remaining window when the priority window is deselected and one window remains', () => {
-    const twoSelected = toggleWindow(toggleWindow(EMPTY_DRAFT, 'window_1'), 'window_2');
-    expect(twoSelected.windowPriority).toBe('window_1');
-    const deselectedPriority = toggleWindow(twoSelected, 'window_1');
-    expect(deselectedPriority.window1Selected).toBe(false);
-    expect(deselectedPriority.window2Selected).toBe(true);
-    expect(deselectedPriority.windowPriority).toBe('window_2');
-  });
-
-  it('clears priority to null when the priority window is deselected and two windows remain', () => {
-    const allThree = toggleWindow(toggleWindow(toggleWindow(EMPTY_DRAFT, 'window_1'), 'window_2'), 'window_3');
-    expect(allThree.windowPriority).toBe('window_1');
-    const deselectedPriority = toggleWindow(allThree, 'window_1');
-    expect(deselectedPriority.window2Selected).toBe(true);
-    expect(deselectedPriority.window3Selected).toBe(true);
-    expect(deselectedPriority.windowPriority).toBeNull();
-  });
-});
-
-describe('setWindowPriority', () => {
-  it('sets the priority explicitly', () => {
-    const draft = { ...EMPTY_DRAFT, window1Selected: true, window2Selected: true };
-    expect(setWindowPriority(draft, 'window_2').windowPriority).toBe('window_2');
+    expect(
+      canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: true, arrivalDate: '2027-07-01', departureDate: '2027-07-01' })
+    ).toBe(false);
+    expect(
+      canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: true, arrivalDate: '2027-06-30', departureDate: '2027-07-06' })
+    ).toBe(true);
   });
 });
