@@ -53,6 +53,13 @@ describe('validateDraftForSubmit', () => {
     expect(errors).toContain('A valid email is required when attending');
   });
 
+  it('rejects a malformed email for a not-attending guest but allows it blank', () => {
+    expect(validateDraftForSubmit({ ...EMPTY_DRAFT, name: 'Steve', attending: false, email: 'steve@nowhere' })).toEqual([
+      "That email doesn't look right",
+    ]);
+    expect(validateDraftForSubmit({ ...EMPTY_DRAFT, name: 'Steve', attending: false, email: '   ' })).toEqual([]);
+  });
+
   it('accepts an email with surrounding whitespace and capitals', () => {
     expect(validateDraftForSubmit({ ...attending, email: '  Steve@Example.com ' })).toEqual([]);
   });

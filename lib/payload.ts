@@ -42,6 +42,13 @@ export interface AdminResponse {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export const EMAIL_HINT = "That email doesn't look right";
+
+/** True when the email is non-empty but malformed; an empty email is never a problem here. */
+export function hasMalformedEmail(value: unknown): boolean {
+  return asTrimmedString(value).length > 0 && !isValidEmail(value);
+}
+
 function asTrimmedString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
@@ -70,11 +77,14 @@ export function validateDraftForSubmit(draft: DraftResponse): string[] {
   const errors: string[] = [];
   if (typeof draft?.name !== 'string' || !draft.name.trim()) errors.push('Name is required');
   if (!draft || draft.attending === null || draft.attending === undefined) errors.push('Attending is required');
+  if (hasMalformedEmail(draft?.email)) errors.push(EMAIL_HINT);
   if (draft?.attending === true) {
     if (draft.partySize === null || draft.partySize === undefined || draft.partySize < 1) {
       errors.push('Party size is required when attending');
     }
-    if (!isValidEmail(draft.email)) errors.push('A valid email is required when attending');
+    if (!isValidEmail(draft.email) && !hasMalformedEmail(draft.email)) {
+      errors.push('A valid email is required when attending');
+    }
     if (draft.hotelStaying === true) {
       const dateError = validateStayDates(draft.arrivalDate ?? null, draft.departureDate ?? null);
       if (dateError) errors.push(dateError);

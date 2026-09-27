@@ -1,5 +1,5 @@
 import type { DraftResponse, ModuleId } from './types';
-import { isValidEmail, validateStayDates } from './payload';
+import { hasMalformedEmail, isValidEmail, validateStayDates } from './payload';
 
 export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId {
   switch (current) {
@@ -24,6 +24,7 @@ export function canAdvanceFromInOut(draft: DraftResponse): boolean {
 
 export function canAdvanceFromNameCrew(draft: DraftResponse): boolean {
   if (!draft.name.trim()) return false;
+  if (hasMalformedEmail(draft.email)) return false;
   if (draft.attending !== true) return true;
   if (draft.partySize === null || draft.partySize < 1) return false;
   return isValidEmail(draft.email);

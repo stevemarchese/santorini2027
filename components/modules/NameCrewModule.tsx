@@ -4,6 +4,7 @@ import ExpandableSection from '@/components/ExpandableSection';
 import ModulePanel from '@/components/ModulePanel';
 import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import { canAdvanceFromNameCrew } from '@/lib/flow';
+import { EMAIL_HINT, hasMalformedEmail } from '@/lib/payload';
 import type { DraftResponse } from '@/lib/types';
 
 const PARTY_SIZE_OPTIONS: { value: number; label: string }[] = [
@@ -49,6 +50,7 @@ export default function NameCrewModule({ draft, onAdvance, onBack }: NameCrewMod
         value={local.email}
         onChange={(event) => setLocal({ ...local, email: event.target.value })}
       />
+      {hasMalformedEmail(local.email) && <p className="mt-2 text-xs text-sage">{EMAIL_HINT}</p>}
       <ExpandableSection open={local.attending === true}>
         <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
         <div className="mt-3 flex flex-wrap gap-3">

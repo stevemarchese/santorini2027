@@ -45,7 +45,7 @@ export default function HotelModule({ draft, bookingNote, onAdvance, onBack }: H
   const [local, setLocal] = useState(draft);
   const staying = local.hotelStaying === true;
   const dateError = staying ? validateStayDates(local.arrivalDate, local.departureDate) : null;
-  const showHint = staying && local.arrivalDate !== null && local.departureDate !== null && dateError !== null;
+  const showHint = staying && dateError !== null;
 
   function chooseYes() {
     setLocal({

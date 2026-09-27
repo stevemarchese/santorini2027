@@ -53,6 +53,15 @@ describe('HotelModule', () => {
     expect(screen.getByRole('button', { name: /^next/i })).toBeEnabled();
   });
 
+  it('shows the required hint and disables Next when a date is cleared', async () => {
+    const user = userEvent.setup();
+    renderHotel();
+    await user.click(screen.getByRole('button', { name: /^yes$/i }));
+    fireEvent.change(screen.getByLabelText(/^arrive/i), { target: { value: '' } });
+    expect(screen.getByText('Arrival and departure dates are required')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
+  });
+
   it('shows the booking note with the hotel link when staying', async () => {
     const user = userEvent.setup();
     renderHotel();

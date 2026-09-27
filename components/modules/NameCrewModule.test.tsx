@@ -31,6 +31,19 @@ describe('NameCrewModule', () => {
     expect(screen.getByRole('button', { name: /^next/i })).toBeEnabled();
   });
 
+  it('shows a hint under a malformed email and hides it once fixed or emptied', async () => {
+    const user = userEvent.setup();
+    render(<NameCrewModule draft={{ ...EMPTY_DRAFT, attending: false }} onAdvance={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.queryByText("That email doesn't look right")).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText(/^email/i), 'steve@nowhere');
+    expect(screen.getByText("That email doesn't look right")).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
+    await user.type(screen.getByLabelText(/^email/i), '.com');
+    expect(screen.queryByText("That email doesn't look right")).not.toBeInTheDocument();
+    await user.clear(screen.getByLabelText(/^email/i));
+    expect(screen.queryByText("That email doesn't look right")).not.toBeInTheDocument();
+  });
+
   it('shows the email helper text and marks email optional when not attending', () => {
     render(<NameCrewModule draft={{ ...EMPTY_DRAFT, attending: false }} onAdvance={vi.fn()} onBack={vi.fn()} />);
     expect(screen.getByText('So we can send you the details.')).toBeInTheDocument();

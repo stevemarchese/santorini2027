@@ -32,6 +32,13 @@ describe('canAdvanceFromNameCrew', () => {
     expect(canAdvanceFromNameCrew({ ...EMPTY_DRAFT, name: 'Steve', attending: false })).toBe(true);
   });
 
+  it('rejects a non-empty invalid email even when not attending, but allows it empty', () => {
+    const base = { ...EMPTY_DRAFT, attending: false, name: 'Steve' };
+    expect(canAdvanceFromNameCrew({ ...base, email: '' })).toBe(true);
+    expect(canAdvanceFromNameCrew({ ...base, email: 'steve@nowhere' })).toBe(false);
+    expect(canAdvanceFromNameCrew({ ...base, email: 'steve@example.com' })).toBe(true);
+  });
+
   it('requires name, party size and a valid email when attending', () => {
     const base = { ...EMPTY_DRAFT, attending: true, name: 'Steve' };
     expect(canAdvanceFromNameCrew(base)).toBe(false);
