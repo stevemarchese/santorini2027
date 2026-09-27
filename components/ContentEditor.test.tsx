@@ -7,6 +7,7 @@ const content = {
   letter: 'Hello friend.',
   confirmationAttending: 'See you in Santorini',
   confirmationNotAttending: 'Thanks for letting us know',
+  hotelBookingNote: 'Book direct',
 };
 
 describe('ContentEditor', () => {
@@ -31,6 +32,7 @@ describe('ContentEditor', () => {
     expect(screen.getByLabelText(/^letter$/i)).toHaveValue('Hello friend.');
     expect(screen.getByLabelText(/confirmation — attending/i)).toHaveValue('See you in Santorini');
     expect(screen.getByLabelText(/confirmation — not attending/i)).toHaveValue('Thanks for letting us know');
+    expect(screen.getByLabelText(/hotel booking note/i)).toHaveValue('Book direct');
   });
 
   it('posts edited content to the API and shows a saved state', async () => {
@@ -49,5 +51,17 @@ describe('ContentEditor', () => {
     const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1];
     expect(JSON.parse(call.body).letter).toBe('New letter body');
     expect(await screen.findByText(/saved\./i)).toBeInTheDocument();
+  });
+
+  it('includes the hotel booking note in the POST body', async () => {
+    const user = userEvent.setup();
+    render(<ContentEditor content={content} />);
+    await user.click(screen.getByText(/site content/i));
+    const note = screen.getByLabelText(/hotel booking note/i);
+    await user.clear(note);
+    await user.type(note, 'Use code MARCHESE');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1];
+    expect(JSON.parse(call.body).hotelBookingNote).toBe('Use code MARCHESE');
   });
 });

@@ -10,6 +10,7 @@ export default function ContentEditor({ content }: ContentEditorProps) {
   const [letter, setLetter] = useState(content.letter);
   const [confirmationAttending, setConfirmationAttending] = useState(content.confirmationAttending);
   const [confirmationNotAttending, setConfirmationNotAttending] = useState(content.confirmationNotAttending);
+  const [hotelBookingNote, setHotelBookingNote] = useState(content.hotelBookingNote);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   async function handleSave() {
@@ -18,7 +19,7 @@ export default function ContentEditor({ content }: ContentEditorProps) {
       const res = await fetch('/api/admin/content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ letter, confirmationAttending, confirmationNotAttending }),
+        body: JSON.stringify({ letter, confirmationAttending, confirmationNotAttending, hotelBookingNote }),
       });
       setStatus(res.ok ? 'saved' : 'error');
     } catch {
@@ -64,6 +65,17 @@ export default function ContentEditor({ content }: ContentEditorProps) {
           className="mb-4 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-sm text-cream outline-none"
           value={confirmationNotAttending}
           onChange={(event) => setConfirmationNotAttending(event.target.value)}
+        />
+
+        <label htmlFor="hotel-booking-note" className="block text-sm font-semibold uppercase tracking-wide text-sage">
+          Hotel booking note
+        </label>
+        <p className="mb-1 text-xs text-cream/60">Shown under the Adamastos dates. The hotel link is added automatically.</p>
+        <input
+          id="hotel-booking-note"
+          className="mb-4 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-sm text-cream outline-none"
+          value={hotelBookingNote}
+          onChange={(event) => setHotelBookingNote(event.target.value)}
         />
 
         <div className="flex items-center gap-4">

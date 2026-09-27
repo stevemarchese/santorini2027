@@ -26,6 +26,7 @@ describe('mergeSiteContent', () => {
         { key: 'letter', value: 'New letter' },
         { key: 'confirmation_attending', value: 'Yay' },
         { key: 'confirmation_not_attending', value: 'Aww' },
+        { key: 'hotel_booking_note', value: 'Call the front desk' },
       ],
       DEFAULT_SITE_CONTENT
     );
@@ -33,8 +34,14 @@ describe('mergeSiteContent', () => {
       letter: 'New letter',
       confirmationAttending: 'Yay',
       confirmationNotAttending: 'Aww',
+      hotelBookingNote: 'Call the front desk',
     });
   });
+
+  it('ships a default hotel booking note that tells guests to book directly', () => {
+    expect(DEFAULT_SITE_CONTENT.hotelBookingNote).toMatch(/book directly/i);
+  });
+
   it('falls back to the default when a row value is blank', () => {
     const merged = mergeSiteContent([{ key: 'letter', value: '   ' }], DEFAULT_SITE_CONTENT);
     expect(merged.letter).toBe(DEFAULT_SITE_CONTENT.letter);

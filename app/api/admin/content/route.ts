@@ -6,6 +6,7 @@ interface ContentBody {
   letter: string;
   confirmationAttending: string;
   confirmationNotAttending: string;
+  hotelBookingNote: string;
 }
 
 export async function POST(request: Request) {
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
     { key: 'letter', value: body.letter ?? '', updated_at: updatedAt },
     { key: 'confirmation_attending', value: body.confirmationAttending ?? '', updated_at: updatedAt },
     { key: 'confirmation_not_attending', value: body.confirmationNotAttending ?? '', updated_at: updatedAt },
+    { key: 'hotel_booking_note', value: body.hotelBookingNote ?? '', updated_at: updatedAt },
   ];
 
   const supabase = getSupabaseAdminClient();

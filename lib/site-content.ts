@@ -5,14 +5,16 @@ export interface SiteContent {
   letter: string;
   confirmationAttending: string;
   confirmationNotAttending: string;
+  hotelBookingNote: string;
 }
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
   letter: LETTER_PARAGRAPHS.join('\n\n'),
   confirmationAttending:
-    "Look out for a lot more specific information in the near future! The answers to these questions will help us out immensely. We are humbled that so many people are already on board. It's gonna be awesome!",
+    "You're on the list. Book the hotel when you can — the good rooms go. We'll send details as things firm up.",
   confirmationNotAttending:
     "Thanks for letting us know. We will miss you but totally understand this isn't an easy trip to make. It's 20 years of inflation. Greece is more expensive, we all have families. We'll see each other soon. Promise.",
+  hotelBookingNote: "Book directly with the hotel and mention you're with Steve & Andi's group.",
 };
 
 export function splitParagraphs(text: string): string[] {
@@ -35,6 +37,7 @@ export function mergeSiteContent(
     letter: pick('letter', defaults.letter),
     confirmationAttending: pick('confirmation_attending', defaults.confirmationAttending),
     confirmationNotAttending: pick('confirmation_not_attending', defaults.confirmationNotAttending),
+    hotelBookingNote: pick('hotel_booking_note', defaults.hotelBookingNote),
   };
 }
 
