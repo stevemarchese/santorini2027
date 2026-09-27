@@ -25,7 +25,7 @@ export default function LetterModule({ draft, paragraphs, onAdvance }: LetterMod
         )
       )}
       <div className="mt-6 flex justify-center">
-        <PillButton onClick={() => onAdvance(draft)}>Give Us Some Info</PillButton>
+        <PillButton onClick={() => onAdvance(draft)}>Count me in</PillButton>
       </div>
     </ModulePanel>
   );

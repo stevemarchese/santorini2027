@@ -5,12 +5,9 @@ import AboutIcon from '@/components/AboutIcon';
 import WeatherWidget from '@/components/WeatherWidget';
 import SplashModule from '@/components/modules/SplashModule';
 import LetterModule from '@/components/modules/LetterModule';
-import WindowModule from '@/components/modules/WindowModule';
+import InOutModule from '@/components/modules/InOutModule';
 import NameCrewModule from '@/components/modules/NameCrewModule';
 import HotelModule from '@/components/modules/HotelModule';
-import DateWindowsModule from '@/components/modules/DateWindowsModule';
-import TravelTimingModule from '@/components/modules/TravelTimingModule';
-import DinnerCruiseModule from '@/components/modules/DinnerCruiseModule';
 import ClosingModule from '@/components/modules/ClosingModule';
 import { getNextModule } from '@/lib/flow';
 import { EMPTY_DRAFT } from '@/lib/types';
@@ -29,7 +26,6 @@ export default function Wizard({ content }: WizardProps) {
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const weatherOverlapsPanel = moduleId === 'splash' || moduleId === 'letter' || aboutOpen;
-
   const letterParagraphs = splitParagraphs(content.letter);
 
   function advance(updated: DraftResponse) {
@@ -55,19 +51,18 @@ export default function Wizard({ content }: WizardProps) {
       <WeatherWidget variant={weatherOverlapsPanel ? 'cream' : 'terracotta'} />
       {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
       {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
-      {moduleId === 'window' && (
-        <WindowModule
+      {moduleId === 'inOut' && (
+        <InOutModule
           draft={draft}
           onAdvance={advance}
           quizPassed={quizPassed}
           onQuizPassed={() => setQuizPassed(true)}
         />
       )}
-      {moduleId === 'dateWindows' && <DateWindowsModule draft={draft} onAdvance={advance} onBack={goBack} />}
       {moduleId === 'nameCrew' && <NameCrewModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'hotel' && <HotelModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'travelTiming' && <TravelTimingModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'dinnerCruise' && <DinnerCruiseModule draft={draft} onAdvance={advance} onBack={goBack} />}
+      {moduleId === 'hotel' && (
+        <HotelModule draft={draft} bookingNote={content.hotelBookingNote} onAdvance={advance} onBack={goBack} />
+      )}
       {moduleId === 'closing' && (
         <ClosingModule
           draft={draft}
