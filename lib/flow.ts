@@ -6,8 +6,6 @@ export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId
     case 'splash':
       return 'letter';
     case 'letter':
-      return 'inOut';
-    case 'inOut':
       return 'nameCrew';
     case 'nameCrew':
       return draft.attending ? 'hotel' : 'closing';
@@ -16,10 +14,6 @@ export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId
     case 'closing':
       return 'closing';
   }
-}
-
-export function canAdvanceFromInOut(draft: DraftResponse): boolean {
-  return draft.attending !== null;
 }
 
 export function canAdvanceFromNameCrew(draft: DraftResponse): boolean {

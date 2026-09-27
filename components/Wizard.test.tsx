@@ -4,9 +4,8 @@ import userEvent from '@testing-library/user-event';
 import Wizard from './Wizard';
 import { DEFAULT_SITE_CONTENT } from '@/lib/site-content';
 
-async function reachInOut(user: ReturnType<typeof userEvent.setup>) {
+async function reachLetter(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: /let's make this real/i }));
-  await user.click(screen.getByRole('button', { name: /count me in/i }));
 }
 
 describe('Wizard', () => {
@@ -25,23 +24,23 @@ describe('Wizard', () => {
   it('does not re-show the quiz gate after passing it once and navigating back', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
-    await reachInOut(user);
-    await user.click(screen.getByRole('button', { name: /i'm in/i }));
+    await reachLetter(user);
+    await user.click(screen.getByRole('button', { name: /count me in/i }));
     expect(screen.getByText(/who is this/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
-    await user.click(screen.getByRole('button', { name: /^next/i }));
+    expect(screen.getByLabelText(/^name/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /back/i }));
-    await user.click(screen.getByRole('button', { name: /i'm in/i }));
+    await user.click(screen.getByRole('button', { name: /count me in/i }));
     expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^name/i)).toBeInTheDocument();
   });
 
   it('walks an attending guest through hotel to send', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
-    await reachInOut(user);
-    await user.click(screen.getByRole('button', { name: /i'm in/i }));
+    await reachLetter(user);
+    await user.click(screen.getByRole('button', { name: /count me in/i }));
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
-    await user.click(screen.getByRole('button', { name: /^next/i }));
 
     await user.type(screen.getByLabelText(/^name/i), 'Steve');
     await user.type(screen.getByLabelText(/^email/i), 'steve@example.com');
@@ -70,10 +69,9 @@ describe('Wizard', () => {
   it('skips the hotel step for a guest who cannot make it', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
-    await reachInOut(user);
+    await reachLetter(user);
     await user.click(screen.getByRole('button', { name: /can't make it/i }));
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
-    await user.click(screen.getByRole('button', { name: /^next/i }));
     await user.type(screen.getByLabelText(/^name/i), 'Laura');
     await user.click(screen.getByRole('button', { name: /^next/i }));
     expect(screen.queryByLabelText(/^arrive/i)).not.toBeInTheDocument();

@@ -5,7 +5,6 @@ import AboutIcon from '@/components/AboutIcon';
 import WeatherWidget from '@/components/WeatherWidget';
 import SplashModule from '@/components/modules/SplashModule';
 import LetterModule from '@/components/modules/LetterModule';
-import InOutModule from '@/components/modules/InOutModule';
 import NameCrewModule from '@/components/modules/NameCrewModule';
 import HotelModule from '@/components/modules/HotelModule';
 import ClosingModule from '@/components/modules/ClosingModule';
@@ -50,10 +49,10 @@ export default function Wizard({ content }: WizardProps) {
       />
       <WeatherWidget variant={weatherOverlapsPanel ? 'cream' : 'terracotta'} />
       {moduleId === 'splash' && <SplashModule draft={draft} onAdvance={advance} />}
-      {moduleId === 'letter' && <LetterModule draft={draft} paragraphs={letterParagraphs} onAdvance={advance} />}
-      {moduleId === 'inOut' && (
-        <InOutModule
+      {moduleId === 'letter' && (
+        <LetterModule
           draft={draft}
+          paragraphs={letterParagraphs}
           onAdvance={advance}
           quizPassed={quizPassed}
           onQuizPassed={() => setQuizPassed(true)}

@@ -1,13 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { getNextModule, canAdvanceFromInOut, canAdvanceFromNameCrew, canAdvanceFromHotel } from './flow';
+import { getNextModule, canAdvanceFromNameCrew, canAdvanceFromHotel } from './flow';
 import { EMPTY_DRAFT } from './types';
 
 describe('getNextModule', () => {
-  it('walks splash → letter → inOut → nameCrew unconditionally', () => {
+  it('walks splash → letter → nameCrew unconditionally', () => {
     expect(getNextModule('splash', EMPTY_DRAFT)).toBe('letter');
-    expect(getNextModule('letter', EMPTY_DRAFT)).toBe('inOut');
-    expect(getNextModule('inOut', { ...EMPTY_DRAFT, attending: true })).toBe('nameCrew');
-    expect(getNextModule('inOut', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
+    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: true })).toBe('nameCrew');
+    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
   });
 
   it('routes attending guests through hotel and others straight to closing', () => {
@@ -15,14 +14,6 @@ describe('getNextModule', () => {
     expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
     expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('closing');
     expect(getNextModule('closing', EMPTY_DRAFT)).toBe('closing');
-  });
-});
-
-describe('canAdvanceFromInOut', () => {
-  it('requires an attending answer', () => {
-    expect(canAdvanceFromInOut(EMPTY_DRAFT)).toBe(false);
-    expect(canAdvanceFromInOut({ ...EMPTY_DRAFT, attending: true })).toBe(true);
-    expect(canAdvanceFromInOut({ ...EMPTY_DRAFT, attending: false })).toBe(true);
   });
 });
 

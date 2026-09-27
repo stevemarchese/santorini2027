@@ -4,30 +4,64 @@ import userEvent from '@testing-library/user-event';
 import LetterModule from './LetterModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
-describe('LetterModule', () => {
-  it('renders the provided paragraphs and advances the unchanged draft on Count me in', async () => {
-    const user = userEvent.setup();
-    const onAdvance = vi.fn();
-    const paragraphs = ['First paragraph.', 'Last paragraph.'];
-    render(<LetterModule draft={EMPTY_DRAFT} paragraphs={paragraphs} onAdvance={onAdvance} />);
+function renderLetter(props: Partial<React.ComponentProps<typeof LetterModule>> = {}) {
+  const onAdvance = vi.fn();
+  const onQuizPassed = vi.fn();
+  render(
+    <LetterModule
+      draft={EMPTY_DRAFT}
+      paragraphs={['First paragraph.', 'Last paragraph.']}
+      onAdvance={onAdvance}
+      quizPassed={true}
+      onQuizPassed={onQuizPassed}
+      {...props}
+    />
+  );
+  return { onAdvance, onQuizPassed };
+}
 
+describe('LetterModule', () => {
+  it('renders the provided paragraphs and both answer pills', () => {
+    renderLetter();
     expect(screen.getByText('First paragraph.')).toBeInTheDocument();
     expect(screen.getByText('Last paragraph.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /count me in/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /can't make it/i })).toBeInTheDocument();
+  });
 
+  it('advances with attending true on Count Me In once the quiz is passed', async () => {
+    const user = userEvent.setup();
+    const { onAdvance } = renderLetter({ draft: { ...EMPTY_DRAFT, partySize: 3 } });
     await user.click(screen.getByRole('button', { name: /count me in/i }));
-    expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
+    expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: true, partySize: 3 }));
+  });
+
+  it("advances with attending false and clears party size on Can't Make It", async () => {
+    const user = userEvent.setup();
+    const { onAdvance } = renderLetter({ draft: { ...EMPTY_DRAFT, partySize: 3 } });
+    await user.click(screen.getByRole('button', { name: /can't make it/i }));
+    expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: false, partySize: null }));
+  });
+
+  it('shows the quiz on the first pill click and advances with the chosen answer after passing', async () => {
+    const user = userEvent.setup();
+    const { onAdvance, onQuizPassed } = renderLetter({ quizPassed: false });
+    await user.click(screen.getByRole('button', { name: /can't make it/i }));
+    expect(screen.getByText(/who is this/i)).toBeInTheDocument();
+    expect(onAdvance).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Kiku' }));
+    expect(onQuizPassed).toHaveBeenCalled();
+    expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: false }));
   });
 
   it('renders the Dirtyline title above the letter paragraphs', () => {
-    render(<LetterModule draft={EMPTY_DRAFT} paragraphs={['A paragraph.']} onAdvance={vi.fn()} />);
+    renderLetter();
     expect(screen.getByText("Time flieS. let's hAve fun!")).toBeInTheDocument();
   });
 
   it('renders inside a wide ModulePanel', () => {
-    const { container } = render(
-      <LetterModule draft={EMPTY_DRAFT} paragraphs={['A paragraph.']} onAdvance={vi.fn()} />
-    );
-    const panel = container.querySelector('.animate-module-in') as HTMLElement;
+    renderLetter();
+    const panel = document.querySelector('.animate-module-in') as HTMLElement;
     expect(panel.className).toContain('max-w-2xl');
   });
 });
