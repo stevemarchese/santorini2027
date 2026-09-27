@@ -5,18 +5,36 @@ import NameCrewModule from './NameCrewModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
 describe('NameCrewModule', () => {
-  it('advances with name and party size filled in when attending', async () => {
+  it('advances with name, email and party size when attending', async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
-    render(
-      <NameCrewModule draft={{ ...EMPTY_DRAFT, attending: true }} onAdvance={onAdvance} onBack={vi.fn()} />
-    );
+    render(<NameCrewModule draft={{ ...EMPTY_DRAFT, attending: true }} onAdvance={onAdvance} onBack={vi.fn()} />);
 
     await user.type(screen.getByLabelText(/^name/i), 'Steve');
+    await user.type(screen.getByLabelText(/^email/i), 'steve@example.com');
     await user.click(screen.getByRole('button', { name: '+1' }));
     await user.click(screen.getByRole('button', { name: /^next/i }));
 
-    expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ name: 'Steve', partySize: 2 }));
+    expect(onAdvance).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Steve', email: 'steve@example.com', partySize: 2 })
+    );
+  });
+
+  it('keeps Next disabled while the email is invalid when attending', async () => {
+    const user = userEvent.setup();
+    render(<NameCrewModule draft={{ ...EMPTY_DRAFT, attending: true }} onAdvance={vi.fn()} onBack={vi.fn()} />);
+    await user.type(screen.getByLabelText(/^name/i), 'Steve');
+    await user.click(screen.getByRole('button', { name: '+1' }));
+    await user.type(screen.getByLabelText(/^email/i), 'steve@nowhere');
+    expect(screen.getByRole('button', { name: /^next/i })).toBeDisabled();
+    await user.type(screen.getByLabelText(/^email/i), '.com');
+    expect(screen.getByRole('button', { name: /^next/i })).toBeEnabled();
+  });
+
+  it('shows the email helper text and marks email optional when not attending', () => {
+    render(<NameCrewModule draft={{ ...EMPTY_DRAFT, attending: false }} onAdvance={vi.fn()} onBack={vi.fn()} />);
+    expect(screen.getByText('So we can send you the details.')).toBeInTheDocument();
+    expect(screen.getByLabelText(/^email/i)).not.toBeRequired();
   });
 
   it('advances with just a name when not attending', async () => {

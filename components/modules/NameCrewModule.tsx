@@ -36,6 +36,19 @@ export default function NameCrewModule({ draft, onAdvance, onBack }: NameCrewMod
         value={local.name}
         onChange={(event) => setLocal({ ...local, name: event.target.value })}
       />
+      <label htmlFor="email" className="mt-4 block text-sm font-semibold uppercase tracking-wide text-sage">
+        Email {local.attending === true ? '*' : ''}
+      </label>
+      <p className="text-xs text-sage">So we can send you the details.</p>
+      <input
+        id="email"
+        type="email"
+        autoComplete="email"
+        required={local.attending === true}
+        className="mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none"
+        value={local.email}
+        onChange={(event) => setLocal({ ...local, email: event.target.value })}
+      />
       <ExpandableSection open={local.attending === true}>
         <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
         <div className="mt-3 flex flex-wrap gap-3">
