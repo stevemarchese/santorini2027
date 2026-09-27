@@ -3,17 +3,17 @@ import { useState } from 'react';
 import ModulePanel from '@/components/ModulePanel';
 import ModuleWaveHeader from '@/components/ModuleWaveHeader';
 import QuizGate from '@/components/QuizGate';
-import { canAdvanceFromWindow } from '@/lib/flow';
+import { canAdvanceFromInOut } from '@/lib/flow';
 import type { DraftResponse } from '@/lib/types';
 
-interface WindowModuleProps {
+interface InOutModuleProps {
   draft: DraftResponse;
   onAdvance: (updated: DraftResponse) => void;
   quizPassed: boolean;
   onQuizPassed: () => void;
 }
 
-export default function WindowModule({ draft, onAdvance, quizPassed, onQuizPassed }: WindowModuleProps) {
+export default function InOutModule({ draft, onAdvance, quizPassed, onQuizPassed }: InOutModuleProps) {
   const [local, setLocal] = useState(draft);
   const [showQuiz, setShowQuiz] = useState(false);
 
@@ -32,20 +32,19 @@ export default function WindowModule({ draft, onAdvance, quizPassed, onQuizPasse
     );
   }
 
+  const pill = (selected: boolean) =>
+    `rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+      selected ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
+    }`;
+
   return (
     <ModulePanel draggable>
-      <ModuleWaveHeader
-        title="Start wiTh The baSics"
-        subtitle="The simple questions"
-        titleClassName="text-[24px]"
-      />
+      <ModuleWaveHeader title="ThE bIg QueStion" subtitle="June 30 – July 6, 2027" titleClassName="text-[24px]" />
       <p className="mt-[6px] text-sm text-cream">
-        We are planning to be in Greece in late June or early to mid July, 2027. Plan is to have a few
-        group events over that time.
+        We&apos;ll be on Santorini from Tuesday June 30 through Monday July 6, 2027. Group things will happen
+        inside that window.
       </p>
-      <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-sage">
-        Does that window work for you? *
-      </p>
+      <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-sage">Are you in? *</p>
       <div className="mt-5 flex gap-3">
         <button
           type="button"
@@ -53,11 +52,9 @@ export default function WindowModule({ draft, onAdvance, quizPassed, onQuizPasse
             maybeTriggerQuiz();
             setLocal({ ...local, attending: true });
           }}
-          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
-            local.attending === true ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-          }`}
+          className={pill(local.attending === true)}
         >
-          Tell me More
+          I&apos;m in
         </button>
         <button
           type="button"
@@ -65,11 +62,9 @@ export default function WindowModule({ draft, onAdvance, quizPassed, onQuizPasse
             maybeTriggerQuiz();
             setLocal({ ...local, attending: false, partySize: null });
           }}
-          className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
-            local.attending === false ? 'bg-terracotta text-cream' : 'bg-cream text-navy'
-          }`}
+          className={pill(local.attending === false)}
         >
-          Can&apos;t make it work
+          Can&apos;t make it
         </button>
       </div>
       <div className="mt-10 flex items-center justify-between">
@@ -77,7 +72,7 @@ export default function WindowModule({ draft, onAdvance, quizPassed, onQuizPasse
         <button
           type="button"
           onClick={() => onAdvance(local)}
-          disabled={!canAdvanceFromWindow(local)}
+          disabled={!canAdvanceFromInOut(local)}
           className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
         >
           Next <span className="animate-arrow-bob">→</span>
