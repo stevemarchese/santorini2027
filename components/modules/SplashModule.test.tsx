@@ -5,7 +5,7 @@ import SplashModule from './SplashModule';
 import { EMPTY_DRAFT } from '@/lib/types';
 
 describe('SplashModule', () => {
-  it('renders the title and subhead, and advances the unchanged draft on Dates are set', async () => {
+  it("renders the title and subhead, and advances the unchanged draft on Let's Make This Real", async () => {
     const user = userEvent.setup();
     const onAdvance = vi.fn();
     render(<SplashModule draft={EMPTY_DRAFT} onAdvance={onAdvance} />);
@@ -13,7 +13,7 @@ describe('SplashModule', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('SAntOrIni! PaRT DeUx');
     expect(screen.getByText('twenty years in the making')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /dates are set/i }));
+    await user.click(screen.getByRole('button', { name: /let's make this real/i }));
     expect(onAdvance).toHaveBeenCalledWith(EMPTY_DRAFT);
   });
 

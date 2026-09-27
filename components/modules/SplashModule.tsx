@@ -31,7 +31,7 @@ export default function SplashModule({ draft, onAdvance }: SplashModuleProps) {
           twenty years in the making
         </p>
         <PillButton onClick={() => onAdvance(draft)} className="animate-splash-cta-in mt-7">
-          Dates are set
+          Let&apos;s Make This Real
         </PillButton>
       </div>
     </div>

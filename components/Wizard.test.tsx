@@ -5,7 +5,7 @@ import Wizard from './Wizard';
 import { DEFAULT_SITE_CONTENT } from '@/lib/site-content';
 
 async function reachInOut(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: /dates are set/i }));
+  await user.click(screen.getByRole('button', { name: /let's make this real/i }));
   await user.click(screen.getByRole('button', { name: /count me in/i }));
 }
 
@@ -14,11 +14,11 @@ describe('Wizard', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
   });
 
-  it('starts on the splash screen and reveals the Letter after Dates are set', async () => {
+  it("starts on the splash screen and reveals the Letter after Let's Make This Real", async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('SAntOrIni! PaRT DeUx');
-    await user.click(screen.getByRole('button', { name: /dates are set/i }));
+    await user.click(screen.getByRole('button', { name: /let's make this real/i }));
     expect(screen.getByRole('button', { name: /count me in/i })).toBeInTheDocument();
   });
 
