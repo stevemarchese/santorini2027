@@ -29,4 +29,18 @@ describe('sortResponses', () => {
     sortResponses(rows, 'name', 'asc');
     expect(rows.map((r) => r.name)).toEqual(before);
   });
+
+  it('sorts by arrival_date as ISO strings with nulls last', () => {
+    const rows = [
+      row({ name: 'late', arrival_date: '2027-07-02' }),
+      row({ name: 'none', arrival_date: null }),
+      row({ name: 'early', arrival_date: '2027-06-30' }),
+    ];
+    expect(sortResponses(rows, 'arrival_date', 'asc').map((r) => r.name)).toEqual(['early', 'late', 'none']);
+  });
+
+  it('sorts by email', () => {
+    const rows = [row({ name: 'z', email: 'z@example.com' }), row({ name: 'a', email: 'a@example.com' })];
+    expect(sortResponses(rows, 'email', 'asc').map((r) => r.name)).toEqual(['a', 'z']);
+  });
 });

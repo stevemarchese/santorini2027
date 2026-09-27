@@ -1,6 +1,6 @@
-import type { AdminResponse } from './payload';
+import type { AdminResponse, ResponsePhase } from './payload';
 
-const HEADERS = [
+const INTEREST_HEADERS = [
   'Submitted',
   'Name',
   'Attending',
@@ -39,7 +39,7 @@ function yesNo(value: boolean | null): string {
   return value == null ? '' : value ? 'Yes' : 'No';
 }
 
-function rowValues(row: AdminResponse): string[] {
+function interestRowValues(row: AdminResponse): string[] {
   return [
     row.created_at.slice(0, 10),
     row.name,
@@ -56,7 +56,25 @@ function rowValues(row: AdminResponse): string[] {
   ];
 }
 
-export function buildResponsesCsv(rows: AdminResponse[]): string {
-  const lines = [HEADERS, ...rows.map(rowValues)].map((cols) => cols.map(escapeCsv).join(','));
+const CONFIRM_HEADERS = ['Submitted', 'Name', 'Email', 'Attending', 'Crew', 'Hotel', 'Arrive', 'Depart', 'Note'];
+
+function confirmRowValues(row: AdminResponse): string[] {
+  return [
+    row.created_at.slice(0, 10),
+    row.name,
+    row.email ?? '',
+    row.attending ? 'Yes' : 'No',
+    row.party_size == null ? '' : String(row.party_size),
+    yesNo(row.hotel_staying),
+    row.arrival_date ?? '',
+    row.departure_date ?? '',
+    row.note ?? '',
+  ];
+}
+
+export function buildResponsesCsv(rows: AdminResponse[], phase: ResponsePhase): string {
+  const headers = phase === 'confirm' ? CONFIRM_HEADERS : INTEREST_HEADERS;
+  const toValues = phase === 'confirm' ? confirmRowValues : interestRowValues;
+  const lines = [headers, ...rows.map(toValues)].map((cols) => cols.map(escapeCsv).join(','));
   return lines.join('\n');
 }

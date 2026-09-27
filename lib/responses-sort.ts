@@ -9,7 +9,9 @@ export type SortKey =
   | 'window_priority'
   | 'travel_timing'
   | 'dinner_interested'
-  | 'cruise_interested';
+  | 'cruise_interested'
+  | 'email'
+  | 'arrival_date';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -33,6 +35,10 @@ function accessor(row: AdminResponse, key: SortKey): number | string | null {
       return row.dinner_interested == null ? null : row.dinner_interested ? 1 : 0;
     case 'cruise_interested':
       return row.cruise_interested == null ? null : row.cruise_interested ? 1 : 0;
+    case 'email':
+      return row.email;
+    case 'arrival_date':
+      return row.arrival_date;
   }
 }
 
