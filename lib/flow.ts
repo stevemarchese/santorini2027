@@ -6,11 +6,9 @@ export function getNextModule(current: ModuleId, draft: DraftResponse): ModuleId
     case 'splash':
       return 'letter';
     case 'letter':
-      return 'nameCrew';
-    case 'nameCrew':
-      return draft.attending ? 'hotel' : 'closing';
-    case 'hotel':
-      return 'closing';
+      return draft.attending ? 'confirm' : 'closing';
+    case 'confirm':
+      return 'confirm';
     case 'closing':
       return 'closing';
   }
@@ -28,4 +26,8 @@ export function canAdvanceFromHotel(draft: DraftResponse): boolean {
   if (draft.hotelStaying === null) return false;
   if (draft.hotelStaying === false) return true;
   return validateStayDates(draft.arrivalDate, draft.departureDate) === null;
+}
+
+export function canSubmitConfirmation(draft: DraftResponse): boolean {
+  return canAdvanceFromNameCrew(draft) && canAdvanceFromHotel(draft);
 }

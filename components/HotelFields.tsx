@@ -1,20 +1,15 @@
 'use client';
-import { useState } from 'react';
 import ExpandableSection from '@/components/ExpandableSection';
-import ModulePanel from '@/components/ModulePanel';
-import ModuleWaveHeader from '@/components/ModuleWaveHeader';
-import { canAdvanceFromHotel } from '@/lib/flow';
 import { validateStayDates } from '@/lib/payload';
 import { STAY_MAX, STAY_MIN, TRIP_END, TRIP_START } from '@/lib/trip-dates';
 import type { DraftResponse } from '@/lib/types';
 
 const HOTEL_URL = 'https://adamastoshotel.com/en/';
 
-interface HotelModuleProps {
-  draft: DraftResponse;
+interface HotelFieldsProps {
+  value: DraftResponse;
   bookingNote: string;
-  onAdvance: (updated: DraftResponse) => void;
-  onBack: () => void;
+  onChange: (updated: DraftResponse) => void;
 }
 
 function HotelLink({ children }: { children: React.ReactNode }) {
@@ -41,8 +36,7 @@ function HotelLink({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function HotelModule({ draft, bookingNote, onAdvance, onBack }: HotelModuleProps) {
-  const [local, setLocal] = useState(draft);
+export default function HotelFields({ value: local, bookingNote, onChange: setLocal }: HotelFieldsProps) {
   const staying = local.hotelStaying === true;
   const dateError = staying ? validateStayDates(local.arrivalDate, local.departureDate) : null;
   const showHint = staying && dateError !== null;
@@ -68,9 +62,8 @@ export default function HotelModule({ draft, bookingNote, onAdvance, onBack }: H
     'mt-1 w-full border-b border-cream/35 bg-transparent px-1 py-2 text-cream outline-none [color-scheme:dark]';
 
   return (
-    <ModulePanel>
-      <ModuleWaveHeader title="ThE fAmily HoTel" subtitle="Nicely Upgraded Since 2007" titleClassName="text-[24px]" />
-      <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">
+    <>
+      <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-sage">
         Staying at the <HotelLink>Adamastos Hotel</HotelLink>? *
       </p>
       <div className="mt-4 flex gap-3">
@@ -117,19 +110,6 @@ export default function HotelModule({ draft, bookingNote, onAdvance, onBack }: H
           {bookingNote} <HotelLink>adamastoshotel.com</HotelLink>
         </p>
       </ExpandableSection>
-      <div className="mt-10 flex items-center justify-between">
-        <button type="button" onClick={onBack} className="text-sm font-semibold uppercase tracking-wide text-sage">
-          <span className="animate-arrow-bob">←</span> Back
-        </button>
-        <button
-          type="button"
-          onClick={() => onAdvance(local)}
-          disabled={!canAdvanceFromHotel(local)}
-          className="text-sm font-semibold uppercase tracking-wide text-sage disabled:opacity-40"
-        >
-          Next <span className="animate-arrow-bob">→</span>
-        </button>
-      </div>
-    </ModulePanel>
+    </>
   );
 }

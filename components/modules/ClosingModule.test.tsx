@@ -34,28 +34,19 @@ describe('ClosingModule', () => {
     expect(await screen.findByText(/see you in santorini/i)).toBeInTheDocument();
   });
 
-  it('shows the not-attending pre-submit headline when attending is false', () => {
+  it('shows the not-attending confirmation immediately with no fields and no submit', () => {
     render(
       <ClosingModule
-        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }}
+        draft={{ ...EMPTY_DRAFT, attending: false }}
         onBack={vi.fn()}
         {...CONFIRMATIONS}
       />
     );
-    expect(screen.getByText(/sorry to miss you/i)).toBeInTheDocument();
-  });
-
-  it('shows the not-attending confirmation after sending', async () => {
-    const user = userEvent.setup();
-    render(
-      <ClosingModule
-        draft={{ ...EMPTY_DRAFT, name: 'Steve', attending: false }}
-        onBack={vi.fn()}
-        {...CONFIRMATIONS}
-      />
-    );
-    await user.click(screen.getByRole('button', { name: /^send$/i }));
-    expect(await screen.findByText(/thanks for letting us know/i)).toBeInTheDocument();
+    expect(screen.getByText(/we heard you/i)).toBeInTheDocument();
+    expect(screen.getByText(/thanks for letting us know/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^send$/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/anything else/i)).not.toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('shows the error state and re-enables Send when fetch rejects (network error)', async () => {

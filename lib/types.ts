@@ -1,4 +1,4 @@
-export type ModuleId = 'splash' | 'letter' | 'nameCrew' | 'hotel' | 'closing';
+export type ModuleId = 'splash' | 'letter' | 'confirm' | 'closing';
 
 export interface DraftResponse {
   name: string;

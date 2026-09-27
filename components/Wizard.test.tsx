@@ -21,40 +21,24 @@ describe('Wizard', () => {
     expect(screen.getByRole('button', { name: /count me in/i })).toBeInTheDocument();
   });
 
-  it('does not re-show the quiz gate after passing it once and navigating back', async () => {
+  it('walks an attending guest through the single confirm screen to send', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
     await reachLetter(user);
     await user.click(screen.getByRole('button', { name: /count me in/i }));
     expect(screen.getByText(/who is this/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
-    expect(screen.getByLabelText(/^name/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /back/i }));
-    await user.click(screen.getByRole('button', { name: /count me in/i }));
-    expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
-    expect(screen.getByLabelText(/^name/i)).toBeInTheDocument();
-  });
 
-  it('walks an attending guest through hotel to send', async () => {
-    const user = userEvent.setup();
-    render(<Wizard content={DEFAULT_SITE_CONTENT} />);
-    await reachLetter(user);
-    await user.click(screen.getByRole('button', { name: /count me in/i }));
-    await user.click(screen.getByRole('button', { name: 'Kiku' }));
-
+    expect(screen.getByText(/you already told us once/i)).toBeInTheDocument();
     await user.type(screen.getByLabelText(/^name/i), 'Steve');
     await user.type(screen.getByLabelText(/^email/i), 'steve@example.com');
     await user.click(screen.getByRole('button', { name: '+1' }));
-    await user.click(screen.getByRole('button', { name: /^next/i }));
-
     await user.click(screen.getByRole('button', { name: /^yes$/i }));
     expect(screen.getByText(DEFAULT_SITE_CONTENT.hotelBookingNote)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /^next/i }));
-
     await user.click(screen.getByRole('button', { name: /^send$/i }));
+
     const submitCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find((call) => call[0] === '/api/submit');
-    const body = JSON.parse(submitCall![1].body);
-    expect(body).toMatchObject({
+    expect(JSON.parse(submitCall![1].body)).toMatchObject({
       name: 'Steve',
       email: 'steve@example.com',
       attending: true,
@@ -66,15 +50,13 @@ describe('Wizard', () => {
     expect(await screen.findByText(DEFAULT_SITE_CONTENT.confirmationAttending)).toBeInTheDocument();
   });
 
-  it('skips the hotel step for a guest who cannot make it', async () => {
+  it('goes straight to the sorry screen for a guest who cannot make it', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
     await reachLetter(user);
     await user.click(screen.getByRole('button', { name: /can't make it/i }));
-    await user.click(screen.getByRole('button', { name: 'Kiku' }));
-    await user.type(screen.getByLabelText(/^name/i), 'Laura');
-    await user.click(screen.getByRole('button', { name: /^next/i }));
-    expect(screen.queryByLabelText(/^arrive/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/sorry to miss you/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^name/i)).not.toBeInTheDocument();
+    expect(screen.getByText(DEFAULT_SITE_CONTENT.confirmationNotAttending)).toBeInTheDocument();
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls.some((c) => c[0] === '/api/submit')).toBe(false);
   });
 });

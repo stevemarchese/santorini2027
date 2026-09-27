@@ -5,8 +5,7 @@ import AboutIcon from '@/components/AboutIcon';
 import WeatherWidget from '@/components/WeatherWidget';
 import SplashModule from '@/components/modules/SplashModule';
 import LetterModule from '@/components/modules/LetterModule';
-import NameCrewModule from '@/components/modules/NameCrewModule';
-import HotelModule from '@/components/modules/HotelModule';
+import ConfirmModule from '@/components/modules/ConfirmModule';
 import ClosingModule from '@/components/modules/ClosingModule';
 import { getNextModule } from '@/lib/flow';
 import { EMPTY_DRAFT } from '@/lib/types';
@@ -58,9 +57,12 @@ export default function Wizard({ content }: WizardProps) {
           onQuizPassed={() => setQuizPassed(true)}
         />
       )}
-      {moduleId === 'nameCrew' && <NameCrewModule draft={draft} onAdvance={advance} onBack={goBack} />}
-      {moduleId === 'hotel' && (
-        <HotelModule draft={draft} bookingNote={content.hotelBookingNote} onAdvance={advance} onBack={goBack} />
+      {moduleId === 'confirm' && (
+        <ConfirmModule
+          draft={draft}
+          bookingNote={content.hotelBookingNote}
+          confirmationAttending={content.confirmationAttending}
+        />
       )}
       {moduleId === 'closing' && (
         <ClosingModule

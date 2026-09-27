@@ -43,14 +43,22 @@ describe('LetterModule', () => {
     expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: false, partySize: null }));
   });
 
-  it('shows the quiz on the first pill click and advances with the chosen answer after passing', async () => {
+  it('shows the quiz on Count Me In before passing and advances after the right answer', async () => {
     const user = userEvent.setup();
     const { onAdvance, onQuizPassed } = renderLetter({ quizPassed: false });
-    await user.click(screen.getByRole('button', { name: /can't make it/i }));
+    await user.click(screen.getByRole('button', { name: /count me in/i }));
     expect(screen.getByText(/who is this/i)).toBeInTheDocument();
     expect(onAdvance).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Kiku' }));
     expect(onQuizPassed).toHaveBeenCalled();
+    expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: true }));
+  });
+
+  it("never shows the quiz for Can't Make It", async () => {
+    const user = userEvent.setup();
+    const { onAdvance } = renderLetter({ quizPassed: false });
+    await user.click(screen.getByRole('button', { name: /can't make it/i }));
+    expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
     expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: false }));
   });
 

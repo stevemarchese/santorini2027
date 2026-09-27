@@ -1,18 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { getNextModule, canAdvanceFromNameCrew, canAdvanceFromHotel } from './flow';
+import { getNextModule, canAdvanceFromNameCrew, canAdvanceFromHotel, canSubmitConfirmation } from './flow';
 import { EMPTY_DRAFT } from './types';
 
 describe('getNextModule', () => {
-  it('walks splash → letter → nameCrew unconditionally', () => {
+  it('walks splash → letter → confirm for a yes', () => {
     expect(getNextModule('splash', EMPTY_DRAFT)).toBe('letter');
-    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: true })).toBe('nameCrew');
-    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: false })).toBe('nameCrew');
+    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: true })).toBe('confirm');
+    expect(getNextModule('confirm', EMPTY_DRAFT)).toBe('confirm');
   });
 
-  it('routes attending guests through hotel and others straight to closing', () => {
-    expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: true })).toBe('hotel');
-    expect(getNextModule('nameCrew', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
-    expect(getNextModule('hotel', EMPTY_DRAFT)).toBe('closing');
+  it('sends a decline from the letter straight to closing', () => {
+    expect(getNextModule('letter', { ...EMPTY_DRAFT, attending: false })).toBe('closing');
+  });
+
+  it('keeps closing terminal', () => {
     expect(getNextModule('closing', EMPTY_DRAFT)).toBe('closing');
   });
 });
@@ -50,5 +51,16 @@ describe('canAdvanceFromHotel', () => {
     expect(
       canAdvanceFromHotel({ ...EMPTY_DRAFT, hotelStaying: true, arrivalDate: '2027-06-30', departureDate: '2027-07-06' })
     ).toBe(true);
+  });
+});
+
+describe('canSubmitConfirmation', () => {
+  const ok = { ...EMPTY_DRAFT, attending: true, name: 'Steve', email: 'steve@example.com', partySize: 2, hotelStaying: false };
+  it('requires the name/crew rules and the hotel rules together', () => {
+    expect(canSubmitConfirmation(ok)).toBe(true);
+    expect(canSubmitConfirmation({ ...ok, email: 'nope' })).toBe(false);
+    expect(canSubmitConfirmation({ ...ok, hotelStaying: null })).toBe(false);
+    expect(canSubmitConfirmation({ ...ok, hotelStaying: true, arrivalDate: '2027-06-30', departureDate: '2027-07-06' })).toBe(true);
+    expect(canSubmitConfirmation({ ...ok, hotelStaying: true, arrivalDate: '2027-06-30', departureDate: '2027-06-30' })).toBe(false);
   });
 });

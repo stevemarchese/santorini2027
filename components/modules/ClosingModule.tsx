@@ -34,7 +34,7 @@ export default function ClosingModule({
     }
   }
 
-  if (status === 'sent') {
+  if (status === 'sent' || draft.attending === false) {
     return (
       <ModulePanel>
         <ModuleWaveHeader
