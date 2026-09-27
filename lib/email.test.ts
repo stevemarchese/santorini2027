@@ -4,32 +4,35 @@ import { buildResponseRow } from './payload';
 import { EMPTY_DRAFT } from './types';
 
 describe('buildNotificationEmailText', () => {
-  it('includes attending-path details', () => {
+  it('lists email, crew, and hotel dates with night count for an attending guest', () => {
     const row = buildResponseRow({
       ...EMPTY_DRAFT,
       name: 'Steve',
+      email: 'steve@example.com',
       attending: true,
       partySize: 2,
       hotelStaying: true,
-      hotelNights: 3,
-      window1Selected: true,
-      windowPriority: 'window_1',
-      travelTiming: 'both',
-      dinnerInterested: true,
-      cruiseInterested: true,
+      arrivalDate: '2027-06-30',
+      departureDate: '2027-07-06',
+      note: 'Bringing the dog',
     });
     const text = buildNotificationEmailText(row);
-    expect(text).toContain('Steve — ATTENDING');
-    expect(text).toContain('Party size: 2');
-    expect(text).toContain('Staying at Adamastos: yes, 3 night(s)');
-    expect(text).toContain('6/30-7/6');
+    expect(text).toBe(
+      ['Steve — IN', 'Email: steve@example.com', 'Crew: 2', 'Adamastos: yes, arrive Jun 30 → depart Jul 6 (6 nights)', 'Note: Bringing the dog'].join('\n')
+    );
+  });
+
+  it('says Adamastos: no when not staying', () => {
+    const row = buildResponseRow({
+      ...EMPTY_DRAFT, name: 'Steve', email: 'steve@example.com', attending: true, partySize: 1, hotelStaying: false,
+    });
+    expect(buildNotificationEmailText(row)).toContain('Adamastos: no');
   });
 
   it('keeps the not-attending summary short', () => {
     const row = buildResponseRow({ ...EMPTY_DRAFT, name: 'Steve', attending: false });
     const text = buildNotificationEmailText(row);
-    expect(text).toContain('Steve — not attending');
-    expect(text).not.toContain('Party size');
+    expect(text).toBe('Steve — OUT');
   });
 });
 
@@ -42,7 +45,7 @@ describe('sendNotificationEmail', () => {
 
     expect(send).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject: expect.stringContaining('Steve'),
+        subject: 'CONFIRMED: Steve (out)',
         text: expect.stringContaining('Steve'),
       })
     );

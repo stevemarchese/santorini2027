@@ -1,24 +1,19 @@
 import type { ResponseRow } from './payload';
+import { formatShortDate, nightsBetween } from './trip-dates';
 
 export function buildNotificationEmailText(row: ResponseRow): string {
-  const lines = [`${row.name} — ${row.attending ? 'ATTENDING' : 'not attending'}`];
+  const lines = [`${row.name} — ${row.attending ? 'IN' : 'OUT'}`];
+  if (row.email) lines.push(`Email: ${row.email}`);
   if (row.attending) {
-    lines.push(`Party size: ${row.party_size}`);
-    lines.push(
-      row.hotel_staying
-        ? `Staying at Adamastos: yes, ${row.hotel_nights} night(s)`
-        : 'Staying at Adamastos: no'
-    );
-    const windows: string[] = [];
-    if (row.window_1_selected) windows.push('6/30-7/6');
-    if (row.window_2_selected) windows.push('7/7-7/13');
-    if (row.window_3_selected) windows.push('7/14-7/18');
-    lines.push(`Date windows: ${windows.join(', ') || 'none selected'}`);
-    lines.push(`Priority window: ${row.window_priority ?? 'none'}`);
-    lines.push(`Travel timing: ${row.travel_timing ?? 'none'}`);
-    if (row.travel_note) lines.push(`Travel note: ${row.travel_note}`);
-    lines.push(`Group dinner: ${row.dinner_interested ? 'yes' : 'no'}`);
-    lines.push(`Sunset cruise: ${row.cruise_interested ? 'yes' : 'no'}`);
+    lines.push(`Crew: ${row.party_size}`);
+    if (row.hotel_staying && row.arrival_date && row.departure_date) {
+      const nights = nightsBetween(row.arrival_date, row.departure_date);
+      lines.push(
+        `Adamastos: yes, arrive ${formatShortDate(row.arrival_date)} → depart ${formatShortDate(row.departure_date)} (${nights} night${nights === 1 ? '' : 's'})`
+      );
+    } else {
+      lines.push('Adamastos: no');
+    }
   }
   if (row.note) lines.push(`Note: ${row.note}`);
   return lines.join('\n');
@@ -52,7 +47,7 @@ export async function sendNotificationEmail(client: ResendLikeClient, row: Respo
   const result = await client.emails.send({
     from: `Santorini 2027 <${fromEmail}>`,
     to: parseNotifyRecipients(),
-    subject: `New RSVP: ${row.name} (${row.attending ? 'attending' : 'not attending'})`,
+    subject: `CONFIRMED: ${row.name} (${row.attending ? 'in' : 'out'})`,
     text: buildNotificationEmailText(row),
   });
 
