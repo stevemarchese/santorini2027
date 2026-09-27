@@ -1,46 +1,25 @@
-export type ModuleId =
-  | 'splash'
-  | 'letter'
-  | 'window'
-  | 'dateWindows'
-  | 'nameCrew'
-  | 'hotel'
-  | 'travelTiming'
-  | 'dinnerCruise'
-  | 'closing';
-
-export type WindowKey = 'window_1' | 'window_2' | 'window_3';
+export type ModuleId = 'splash' | 'letter' | 'inOut' | 'nameCrew' | 'hotel' | 'closing';
 
 export interface DraftResponse {
   name: string;
+  email: string;
   attending: boolean | null;
   partySize: number | null;
   hotelStaying: boolean | null;
-  hotelNights: number | null;
-  window1Selected: boolean;
-  window2Selected: boolean;
-  window3Selected: boolean;
-  windowPriority: WindowKey | null;
-  travelTiming: 'before' | 'after' | 'both' | 'neither' | null;
-  travelNote: string;
-  dinnerInterested: boolean | null;
-  cruiseInterested: boolean | null;
+  /** ISO YYYY-MM-DD */
+  arrivalDate: string | null;
+  /** ISO YYYY-MM-DD */
+  departureDate: string | null;
   note: string;
 }
 
 export const EMPTY_DRAFT: DraftResponse = {
   name: '',
+  email: '',
   attending: null,
   partySize: null,
   hotelStaying: null,
-  hotelNights: null,
-  window1Selected: false,
-  window2Selected: false,
-  window3Selected: false,
-  windowPriority: null,
-  travelTiming: null,
-  travelNote: '',
-  dinnerInterested: null,
-  cruiseInterested: null,
+  arrivalDate: null,
+  departureDate: null,
   note: '',
 };

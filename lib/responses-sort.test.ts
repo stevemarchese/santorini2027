@@ -1,28 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { sortResponses } from './responses-sort';
-import type { AdminResponse } from './payload';
-
-function row(overrides: Partial<AdminResponse>): AdminResponse {
-  return {
-    id: 'id',
-    created_at: '2026-07-01T00:00:00.000Z',
-    name: 'Person',
-    attending: true,
-    party_size: null,
-    hotel_staying: null,
-    hotel_nights: null,
-    window_1_selected: false,
-    window_2_selected: false,
-    window_3_selected: false,
-    window_priority: null,
-    travel_timing: null,
-    travel_note: null,
-    dinner_interested: null,
-    cruise_interested: null,
-    note: null,
-    ...overrides,
-  };
-}
+import { adminRow as row } from '@/test-mocks/admin-response';
 
 describe('sortResponses', () => {
   it('sorts by name ascending and descending', () => {
