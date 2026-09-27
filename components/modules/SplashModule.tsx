@@ -21,6 +21,11 @@ export default function SplashModule({ draft, onAdvance }: SplashModuleProps) {
           </h1>
         </div>
         <p
+          className={`${dirtyline.className} animate-splash-subtitle-in mt-4 text-[clamp(28px,8vw,50px)] sm:text-[50px] leading-none tracking-wide text-cream`}
+        >
+          June 30 – July 6, 2027
+        </p>
+        <p
           className={`${dirtyline.className} animate-splash-subtitle-in mt-3 text-[clamp(22px,2.6vw,20px)] sm:text-[clamp(14px,2.6vw,20px)] tracking-wide text-cream`}
         >
           twenty years in the making
