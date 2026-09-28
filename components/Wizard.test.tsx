@@ -50,13 +50,17 @@ describe('Wizard', () => {
     expect(await screen.findByText(DEFAULT_SITE_CONTENT.confirmationAttending)).toBeInTheDocument();
   });
 
-  it('goes straight to the sorry screen for a guest who cannot make it', async () => {
+  it('collects name and email from a guest who cannot make it, then shows the sorry screen', async () => {
     const user = userEvent.setup();
     render(<Wizard content={DEFAULT_SITE_CONTENT} />);
     await reachLetter(user);
     await user.click(screen.getByRole('button', { name: /can't make it/i }));
-    expect(screen.queryByLabelText(/^name/i)).not.toBeInTheDocument();
-    expect(screen.getByText(DEFAULT_SITE_CONTENT.confirmationNotAttending)).toBeInTheDocument();
-    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls.some((c) => c[0] === '/api/submit')).toBe(false);
+    await user.click(screen.getByRole('button', { name: 'Kiku' }));
+    expect(screen.queryByRole('link', { name: 'Adamastos Hotel' })).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText(/^name/i), 'Laura');
+    await user.click(screen.getByRole('button', { name: /^send$/i }));
+    const declineCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find((c) => c[0] === '/api/submit');
+    expect(JSON.parse(declineCall![1].body)).toMatchObject({ name: 'Laura', attending: false });
+    expect(await screen.findByText(DEFAULT_SITE_CONTENT.confirmationNotAttending)).toBeInTheDocument();
   });
 });

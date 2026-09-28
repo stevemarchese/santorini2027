@@ -65,12 +65,7 @@ export default function Wizard({ content }: WizardProps) {
         />
       )}
       {moduleId === 'closing' && (
-        <ClosingModule
-          draft={draft}
-          onBack={goBack}
-          confirmationAttending={content.confirmationAttending}
-          confirmationNotAttending={content.confirmationNotAttending}
-        />
+        <ClosingModule draft={draft} confirmationNotAttending={content.confirmationNotAttending} />
       )}
     </main>
   );

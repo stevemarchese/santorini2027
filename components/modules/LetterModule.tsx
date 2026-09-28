@@ -23,8 +23,7 @@ export default function LetterModule({ draft, paragraphs, onAdvance, quizPassed,
   }
 
   function choose(attending: boolean) {
-    // A decline submits nothing, so there is nothing for the quiz gate to protect.
-    if (quizPassed || !attending) {
+    if (quizPassed) {
       onAdvance(withAnswer(attending));
     } else {
       setPendingAttending(attending);

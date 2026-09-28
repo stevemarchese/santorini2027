@@ -1,5 +1,4 @@
 'use client';
-import ExpandableSection from '@/components/ExpandableSection';
 import { EMAIL_HINT, hasMalformedEmail } from '@/lib/payload';
 import type { DraftResponse } from '@/lib/types';
 
@@ -43,7 +42,8 @@ export default function NameCrewFields({ value, onChange }: NameCrewFieldsProps)
         onChange={(event) => onChange({ ...value, email: event.target.value })}
       />
       {hasMalformedEmail(value.email) && <p className="mt-2 text-xs text-sage">{EMAIL_HINT}</p>}
-      <ExpandableSection open={value.attending === true}>
+      {value.attending === true && (
+        <>
         <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-sage">How many in your crew? *</p>
         <div className="mt-3 flex flex-wrap gap-3">
           {PARTY_SIZE_OPTIONS.map(({ value: size, label }) => (
@@ -59,7 +59,8 @@ export default function NameCrewFields({ value, onChange }: NameCrewFieldsProps)
             </button>
           ))}
         </div>
-      </ExpandableSection>
+        </>
+      )}
     </>
   );
 }

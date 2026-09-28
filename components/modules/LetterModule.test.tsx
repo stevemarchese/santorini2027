@@ -54,11 +54,13 @@ describe('LetterModule', () => {
     expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: true }));
   });
 
-  it("never shows the quiz for Can't Make It", async () => {
+  it("shows the quiz for Can't Make It too and advances with attending false after passing", async () => {
     const user = userEvent.setup();
     const { onAdvance } = renderLetter({ quizPassed: false });
     await user.click(screen.getByRole('button', { name: /can't make it/i }));
-    expect(screen.queryByText(/who is this/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/who is this/i)).toBeInTheDocument();
+    expect(onAdvance).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Kiku' }));
     expect(onAdvance).toHaveBeenCalledWith(expect.objectContaining({ attending: false }));
   });
 
